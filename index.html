@@ -1,0 +1,709 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Cooper T. Smith de México</title>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--g1:#3d5229;--g2:#2e3d1e;--g3:#1e2914;--gl:#e8ecdf;--gray:#dedede;--dark:#1a1a1a;--mid:#5a5a5a;--bd:#c8c8c8;--white:#fff}
+body{font-family:'Segoe UI',sans-serif;background:var(--gray);color:var(--dark)}
+.page{display:none}.page.active{display:block}
+nav{display:flex;align-items:center;justify-content:space-between;padding:0 36px;height:62px;background:rgba(255,255,255,0.97);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:200;backdrop-filter:blur(8px)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none;cursor:pointer}
+.logo-svg{width:36px;height:36px;flex-shrink:0}
+.logo-text strong{font-size:14px;color:var(--dark);font-family:Georgia,serif;display:block;line-height:1.2}
+.logo-text span{font-size:10px;color:var(--mid);text-transform:uppercase;letter-spacing:1px}
+.nav-links{display:flex;gap:22px;list-style:none}
+.nav-links a{text-decoration:none;color:var(--dark);font-size:13.5px;font-weight:500;transition:color .2s}.nav-links a:hover{color:var(--g1)}
+.nav-right{display:flex;gap:8px;align-items:center}
+.btn-green{background:var(--g1);color:#fff;border:none;padding:9px 18px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s}.btn-green:hover{background:var(--g2)}
+.btn-admin{background:var(--g3);color:#fff;border:none;padding:9px 16px;border-radius:6px;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;transition:background .2s}.btn-admin:hover{background:#111}
+.hero{position:relative;height:590px;display:flex;align-items:center;overflow:hidden}
+.hero-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(.38)}
+.hero-ov{position:absolute;inset:0;background:linear-gradient(100deg,rgba(30,41,20,.9) 0%,rgba(30,41,20,.35) 65%,transparent 100%)}
+.hero-ct{position:relative;z-index:1;padding:0 72px;max-width:680px}
+.htag{background:rgba(255,255,255,.15);color:#fff;padding:5px 14px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:1px;text-transform:uppercase;display:inline-block;margin-bottom:18px;border:1px solid rgba(255,255,255,.2)}
+.hero h1{color:#fff;font-size:44px;font-weight:800;line-height:1.1;margin-bottom:14px;font-family:Georgia,serif}
+.hero p{color:rgba(255,255,255,.82);font-size:15px;line-height:1.7;margin-bottom:28px}
+.hbtns{display:flex;gap:12px}
+.btn-w{background:#fff;color:var(--g1);border:none;padding:12px 26px;border-radius:6px;font-size:14px;font-weight:700;cursor:pointer;transition:all .2s}.btn-w:hover{background:var(--gl)}
+.btn-o{background:transparent;color:#fff;border:2px solid rgba(255,255,255,.5);padding:12px 26px;border-radius:6px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}.btn-o:hover{border-color:#fff;background:rgba(255,255,255,.08)}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);background:var(--g3)}
+.stat{padding:26px 20px;text-align:center;border-right:1px solid rgba(255,255,255,.1)}.stat:last-child{border-right:none}
+.stat-n{font-size:32px;font-weight:800;color:#fff;font-family:Georgia,serif}.stat-l{font-size:11px;color:rgba(255,255,255,.6);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.sec{padding:60px 72px;background:var(--gray)}
+.sec-w{background:var(--white)}
+.stag{color:var(--g1);font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin-bottom:8px}
+.sec h2{font-size:30px;font-weight:800;margin-bottom:14px;line-height:1.2;font-family:Georgia,serif}
+.sec p.lead{color:var(--mid);font-size:14px;line-height:1.7;max-width:560px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:32px}
+.card{background:var(--white);border:1px solid var(--bd);border-radius:10px;padding:24px;transition:box-shadow .2s;box-shadow:0 1px 4px rgba(0,0,0,.05)}.card:hover{box-shadow:0 6px 20px rgba(0,0,0,.09)}
+.card-ic{width:44px;height:44px;background:var(--gl);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:12px}
+.card h3{font-size:14px;font-weight:700;margin-bottom:6px}.card p{font-size:13px;color:var(--mid);line-height:1.6}
+.ph{position:relative;padding:56px 72px;overflow:hidden}
+.ph-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(.28)}
+.ph-ct{position:relative;z-index:1}
+.ph .stag{color:rgba(255,255,255,.6)}
+.ph h1{font-size:36px;font-weight:800;color:#fff;margin-bottom:10px;font-family:Georgia,serif}
+.ph p{color:rgba(255,255,255,.72);font-size:14px;max-width:580px}
+.photo-sec{position:relative;padding:64px 72px;overflow:hidden}
+.photo-sec-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:brightness(.2)}
+.photo-sec-ct{position:relative;z-index:1}
+.photo-sec .stag{color:rgba(255,255,255,.6)}
+.photo-sec h2{color:#fff}
+.photo-sec p.lead{color:rgba(255,255,255,.7)}
+.photo-sec .card{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);backdrop-filter:blur(6px)}
+.photo-sec .card h3{color:#fff}.photo-sec .card p{color:rgba(255,255,255,.65)}.photo-sec .card-ic{background:rgba(255,255,255,.12)}
+.pg{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:32px}
+.pc{background:var(--g2);border-radius:10px;padding:28px;color:#fff;position:relative;overflow:hidden}
+.pc::after{content:'';position:absolute;top:-25px;right:-25px;width:120px;height:120px;background:rgba(255,255,255,.04);border-radius:50%}
+.pc h3{font-size:18px;font-weight:700;margin-bottom:7px;font-family:Georgia,serif}
+.pc p{font-size:13px;color:rgba(255,255,255,.68);line-height:1.6}
+.ptag{background:rgba(255,255,255,.14);padding:3px 10px;border-radius:4px;font-size:11px;font-weight:600;display:inline-block;margin-bottom:10px}
+.ng{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;margin-top:32px}
+.nc{border-radius:10px;overflow:hidden;border:1px solid var(--bd);background:var(--white)}
+.ni{height:145px;background-size:cover;background-position:center;position:relative}
+.ni-ov{position:absolute;inset:0;background:linear-gradient(to bottom,transparent 40%,rgba(0,0,0,.5))}
+.nb{padding:16px}
+.nd{font-size:11px;color:var(--mid);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.nb h3{font-size:14px;font-weight:700;margin-bottom:6px;line-height:1.3}
+.nb p{font-size:13px;color:var(--mid);line-height:1.5}
+.cg{display:grid;grid-template-columns:1fr 1fr;gap:44px;margin-top:36px}
+.ci-wrap{display:flex;flex-direction:column;gap:16px}
+.ci{display:flex;gap:12px;align-items:flex-start}
+.ci-ic{width:38px;height:38px;background:var(--gl);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.ci h4{font-size:13px;font-weight:700;margin-bottom:2px}.ci p{font-size:13px;color:var(--mid)}
+.cf{display:flex;flex-direction:column;gap:12px;background:var(--white);padding:26px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,.07)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+input,select,textarea{width:100%;padding:10px 12px;border:1px solid var(--bd);border-radius:7px;font-size:13px;font-family:inherit;outline:none;transition:border .2s;background:#fff}
+input:focus,select:focus,textarea:focus{border-color:var(--g1)}
+textarea{resize:vertical;min-height:85px}
+footer{background:var(--g3);color:rgba(255,255,255,.65);padding:44px 72px 24px}
+.fg{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:36px;margin-bottom:32px}
+.fb p{font-size:13px;margin-top:10px;line-height:1.7;max-width:250px}
+.fc h4{color:#fff;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:12px}
+.fc a{display:block;color:rgba(255,255,255,.5);text-decoration:none;font-size:13px;margin-bottom:7px;transition:color .2s;cursor:pointer}.fc a:hover{color:#fff}
+.fb-bot{border-top:1px solid rgba(255,255,255,.1);padding-top:16px;font-size:12px;display:flex;justify-content:space-between;align-items:center}
+.aw{min-height:calc(100vh - 62px);background:var(--gray);padding:44px 16px;display:flex;justify-content:center}
+.ab{background:var(--white);border-radius:14px;padding:36px;width:100%;max-width:600px;box-shadow:0 2px 16px rgba(0,0,0,.08)}
+.ab h2{font-size:22px;font-weight:800;margin-bottom:4px;font-family:Georgia,serif}
+.ab>.sub{font-size:13px;color:var(--mid);margin-bottom:24px}
+.fl{margin-bottom:14px}
+.fl label{display:block;font-size:11px;font-weight:700;margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px}
+.fl label span{color:#c53030}
+.ii{position:relative}.ii input,.ii select{padding-left:36px}.ii .ico{position:absolute;left:10px;top:50%;transform:translateY(-50%);font-size:14px;pointer-events:none}
+.half{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.cfw{min-height:calc(100vh - 62px);background:var(--gray);padding:44px 16px;display:flex;justify-content:center}
+.cfb{background:var(--white);border-radius:14px;width:100%;max-width:520px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.1)}
+.cfh{background:var(--g2);padding:18px 26px;color:#fff;display:flex;justify-content:space-between;align-items:center}
+.cfh h3{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;opacity:.65;margin-bottom:3px}
+.cfh .cfcode{font-size:20px;font-weight:800;font-family:Georgia,serif}
+.badge-cf{background:rgba(255,255,255,.18);padding:4px 11px;border-radius:20px;font-size:11px;font-weight:600;border:1px solid rgba(255,255,255,.22)}
+.cfqr{padding:28px;text-align:center;border-bottom:1px solid var(--bd);background:#fafafa}
+#qrcanvas{display:inline-block}
+.cfbl{font-size:12px;color:var(--mid);margin-top:8px;font-family:monospace;letter-spacing:1px}
+.cfhint{font-size:12px;color:var(--mid);margin-top:6px}
+.cfd{padding:20px 26px}
+.dr{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid #f2f2f2}.dr:last-child{border-bottom:none}
+.di{width:32px;height:32px;background:#f0f0f0;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.dl{font-size:10px;color:var(--mid);text-transform:uppercase;letter-spacing:.5px;margin-bottom:1px}
+.dv{font-size:13px;font-weight:700}
+.cfact{padding:0 26px 26px;display:flex;gap:10px}
+.btn-o2{background:#fff;color:var(--g1);border:2px solid var(--g1);padding:9px 18px;border-radius:7px;font-size:13px;font-weight:600;cursor:pointer;flex:1;transition:all .2s}.btn-o2:hover{background:var(--gl)}
+.adm{display:none;min-height:100vh;background:var(--gray)}
+.adm.active{display:block}
+.lw{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--gray)}
+.lb{background:var(--white);border-radius:14px;padding:40px 36px;width:100%;max-width:380px;box-shadow:0 4px 24px rgba(0,0,0,.1);text-align:center}
+.lb h2{font-size:19px;font-weight:800;margin-bottom:3px;font-family:Georgia,serif}
+.lb>p{font-size:13px;color:var(--mid);margin-bottom:24px}
+.lb .fl{text-align:left}
+.errmsg{background:#fff0f0;color:#c53030;border:1px solid #fecaca;border-radius:7px;padding:8px 12px;font-size:13px;margin-bottom:10px;display:none}
+.an{background:var(--white);border-bottom:1px solid var(--bd);padding:0 30px;height:60px;display:flex;align-items:center;justify-content:space-between}
+.anl{display:flex;align-items:center;gap:10px}
+.anl .ib{width:32px;height:32px;background:var(--g1);border-radius:7px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px}
+.anl h2{font-size:14px;font-weight:800;font-family:Georgia,serif}
+.anl p{font-size:11px;color:var(--mid)}
+.anr{display:flex;gap:8px}
+.bsm{padding:7px 13px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--bd);background:var(--white);display:flex;align-items:center;gap:5px;transition:all .2s}.bsm:hover{background:#f0f0f0}
+.bsm.dng{border-color:#fecaca;color:#c53030}.bsm.dng:hover{background:#fff0f0}
+.atabs{display:flex;border-bottom:1px solid var(--bd);padding:0 30px;background:var(--white)}
+.tab{padding:12px 16px;font-size:13px;font-weight:600;color:var(--mid);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s}
+.tab.active{color:var(--g1);border-bottom-color:var(--g1)}
+.ac{padding:24px 30px}
+.scards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:22px}
+.scard{background:var(--white);border-radius:10px;padding:20px;border:1px solid var(--bd);box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.scard-ic{width:40px;height:40px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:10px}
+.scard-ic.y{background:#fef9c3}.scard-ic.b{background:#dbeafe}.scard-ic.g{background:#dcfce7}.scard-ic.gr{background:#f3f4f6}
+.scard h3{font-size:26px;font-weight:800;margin-bottom:3px;font-family:Georgia,serif}
+.scard p{font-size:12px;color:var(--mid)}
+.charts-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:20px}
+.chart-box{background:var(--white);border-radius:10px;border:1px solid var(--bd);padding:20px;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.chart-box h3{font-size:13px;font-weight:700;margin-bottom:14px;color:var(--dark)}
+.chart-box canvas{max-height:200px}
+.tcontrols{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+.si{position:relative;flex:1}.si input{padding-left:32px}.si .ico{position:absolute;left:9px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--mid)}
+.fsel{padding:8px 12px;border:1px solid var(--bd);border-radius:7px;font-size:12px;font-family:inherit;cursor:pointer;outline:none;background:var(--white)}
+.bdt{padding:8px 12px;border:1px solid var(--bd);border-radius:7px;font-size:12px;background:var(--white);cursor:pointer;display:flex;align-items:center;gap:5px;font-family:inherit}
+.tw{background:var(--white);border-radius:10px;border:1px solid var(--bd);overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,.05)}
+table{width:100%;border-collapse:collapse}
+th{background:#fafafa;padding:11px 14px;font-size:11px;font-weight:700;color:var(--mid);text-align:left;border-bottom:1px solid var(--bd);text-transform:uppercase;letter-spacing:.4px}
+td{padding:12px 14px;font-size:12px;border-bottom:1px solid #f5f5f5;vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#fafafa}
+.badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
+.badge.confirmada{background:#dbeafe;color:#1e40af}.badge.pendiente{background:#fef9c3;color:#854d0e}.badge.completada{background:#dcfce7;color:#14532d}.badge.cancelada{background:#fee2e2;color:#991b1b}
+.am{position:relative;display:inline-block}
+.db{background:none;border:none;cursor:pointer;font-size:16px;padding:3px 7px;border-radius:5px;color:var(--mid)}.db:hover{background:#f0f0f0}
+.dd{position:absolute;right:0;top:24px;background:var(--white);border:1px solid var(--bd);border-radius:7px;min-width:148px;box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:50;display:none}
+.dd.open{display:block}
+.dd button{width:100%;text-align:left;padding:8px 12px;font-size:12px;background:none;border:none;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:7px;transition:background .15s}.dd button:hover{background:#f5f5f5}
+.dd button.del{color:#c53030}
+.ssel{border:none;background:none;font-size:11px;font-weight:600;cursor:pointer;font-family:inherit;padding:0 3px;outline:none}
+.csub{font-size:11px;color:var(--mid);margin-top:1px}
+.mov{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:300;display:none;align-items:center;justify-content:center}
+.mov.open{display:flex}
+.mo{background:var(--white);border-radius:12px;padding:28px;max-width:440px;width:90%;max-height:85vh;overflow-y:auto}
+.mo h3{font-size:16px;font-weight:800;margin-bottom:2px;font-family:Georgia,serif}
+.mosub{font-size:13px;color:var(--mid);margin-bottom:20px}
+.mact{display:flex;gap:8px;margin-top:16px;justify-content:flex-end}
+#dash-tab{display:block}#citas-tab{display:none}
+@media(max-width:900px){
+  nav{padding:0 16px}
+  .nav-links{display:none}
+  .hero-ct{padding:0 26px}
+  .hero h1{font-size:34px}
+  .stats,.g3,.ng,.scards,.charts-row,.fg,.cg,.g2,.pg{grid-template-columns:1fr}
+  .sec,.ph,.photo-sec,footer{padding-left:22px;padding-right:22px}
+  .half,.fr{grid-template-columns:1fr}
+  .tcontrols{flex-direction:column;align-items:stretch}
+  table{min-width:760px}
+  .tw{overflow-x:auto}
+}
+</style>
+</head>
+<body>
+
+<nav id="main-nav">
+  <a class="logo" onclick="showPage('home')">
+    <svg class="logo-svg" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <polygon points="30,3 57,30 30,57 3,30" fill="#3d5229" stroke="#fff" stroke-width="1.5"/>
+      <polygon points="30,10 50,30 30,50 10,30" fill="none" stroke="#fff" stroke-width="1"/>
+      <text x="30" y="37" text-anchor="middle" font-family="Georgia,serif" font-size="22" font-weight="bold" fill="#fff">C</text>
+    </svg>
+    <div class="logo-text"><strong>Cooper/T. Smith</strong><span>de México</span></div>
+  </a>
+  <ul class="nav-links">
+    <li><a onclick="showPage('home')">Inicio</a></li>
+    <li><a onclick="showPage('nosotros')">Nosotros</a></li>
+    <li><a onclick="showPage('infra')">Infraestructura</a></li>
+    <li><a onclick="showPage('proyectos')">Proyectos</a></li>
+    <li><a onclick="showPage('noticias')">Noticias</a></li>
+    <li><a onclick="showPage('contacto')">Contacto</a></li>
+  </ul>
+  <div class="nav-right">
+    <button class="btn-green" onclick="showPage('agenda')">Agendar Cita</button>
+    <button class="btn-admin" onclick="showAdminLogin()">⚙ Admin</button>
+  </div>
+</nav>
+
+<div id="page-home" class="page active">
+  <div class="hero">
+    <div class="hero-bg" style="background-image:url('https://images.unsplash.com/photo-1595001989023-0b4c3abea7d8?w=1600&q=80')"></div>
+    <div class="hero-ov"></div>
+    <div class="hero-ct">
+      <div class="htag">🚢 Terminal Portuaria — Tampico, Tamaulipas</div>
+      <h1>Soluciones Logísticas de Clase Mundial</h1>
+      <p>Cooper/T. Smith de México ofrece servicios integrales de manejo, almacenamiento y distribución de carga en el Puerto de Tampico con más de 40 años de experiencia.</p>
+      <div class="hbtns">
+        <button class="btn-w" onclick="showPage('agenda')">Agendar Cita</button>
+        <button class="btn-o" onclick="showPage('nosotros')">Conoce más</button>
+      </div>
+    </div>
+  </div>
+  <div class="stats">
+    <div class="stat"><div class="stat-n">+40</div><div class="stat-l">Años de Experiencia</div></div>
+    <div class="stat"><div class="stat-n">500K</div><div class="stat-l">Toneladas Anuales</div></div>
+    <div class="stat"><div class="stat-n">150+</div><div class="stat-l">Clientes Activos</div></div>
+    <div class="stat"><div class="stat-n">24/7</div><div class="stat-l">Operación Continua</div></div>
+  </div>
+  <div class="sec g2">
+    <div>
+      <div class="stag">¿Quiénes somos?</div>
+      <h2>Líderes en Logística Portuaria en México</h2>
+      <p class="lead">Somos una empresa dedicada al manejo eficiente de carga a granel, fertilizantes, carbón y mercancías generales. Con presencia en el Puerto de Tampico, garantizamos operaciones seguras y puntuales.</p>
+      <br/>
+      <button class="btn-green" onclick="showPage('nosotros')" style="margin-top:6px">Leer más</button>
+    </div>
+    <div style="border-radius:14px;height:280px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.15);background-image:url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=900&q=80');background-size:cover;background-position:center"></div>
+  </div>
+  <div class="sec sec-w">
+    <div class="stag">Servicios</div>
+    <h2>Lo que ofrecemos</h2>
+    <div class="g3">
+      <div class="card"><div class="card-ic">🚢</div><h3>Manejo de Carga</h3><p>Descarga, carga y almacenamiento de mercancías a granel con equipo especializado.</p></div>
+      <div class="card"><div class="card-ic">📦</div><h3>Almacenamiento</h3><p>Bodegas con capacidad para miles de toneladas, control de temperatura y seguridad 24/7.</p></div>
+      <div class="card"><div class="card-ic">🚛</div><h3>Distribución</h3><p>Transporte y distribución terrestre hacia cualquier punto de la República Mexicana.</p></div>
+      <div class="card"><div class="card-ic">📋</div><h3>Gestión Aduanal</h3><p>Asesoría y trámites aduanales para importación y exportación de mercancías.</p></div>
+      <div class="card"><div class="card-ic">🔒</div><h3>Seguridad Portuaria</h3><p>Protocolos ISPS y certificaciones internacionales de seguridad para todas las operaciones.</p></div>
+      <div class="card"><div class="card-ic">📊</div><h3>Reportes en Tiempo Real</h3><p>Sistema de trazabilidad para monitorear el estado de tu carga en todo momento.</p></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-nosotros" class="page">
+  <div class="ph">
+    <div class="ph-bg" style="background-image:url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=1600&q=80')"></div>
+    <div class="ph-ct">
+      <div class="stag">La Empresa</div>
+      <h1>Acerca de Cooper/T. Smith</h1>
+      <p>Más de cuatro décadas de experiencia posicionándonos como referente en logística portuaria en el norte de México.</p>
+    </div>
+  </div>
+  <div class="sec g2">
+    <div>
+      <div class="stag">Nuestra Historia</div>
+      <h2>Fundada con visión de futuro</h2>
+      <p class="lead">Cooper/T. Smith de México fue fundada con el propósito de optimizar las operaciones logísticas en el Puerto de Tampico. A lo largo de los años hemos expandido nuestra capacidad operativa y tecnológica para atender las crecientes demandas del comercio internacional.</p>
+    </div>
+    <div style="border-radius:14px;height:260px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);background-image:url('https://images.unsplash.com/photo-1504309092620-4d0ec726efa4?w=900&q=80');background-size:cover;background-position:center"></div>
+  </div>
+  <div class="photo-sec">
+    <div class="photo-sec-bg" style="background-image:url('https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=80')"></div>
+    <div class="photo-sec-ct">
+      <div class="stag">Valores</div>
+      <h2>Lo que nos define</h2>
+      <p class="lead">Operamos con los más altos estándares de compromiso, sustentabilidad y confianza en cada operación.</p>
+      <div class="g3">
+        <div class="card"><div class="card-ic">🎯</div><h3>Compromiso</h3><p>Cumplimos con los plazos y condiciones pactados con cada uno de nuestros clientes.</p></div>
+        <div class="card"><div class="card-ic">🌱</div><h3>Sustentabilidad</h3><p>Operamos con responsabilidad ambiental y social en todas nuestras actividades.</p></div>
+        <div class="card"><div class="card-ic">🤝</div><h3>Confianza</h3><p>Construimos relaciones de largo plazo basadas en transparencia y resultados.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-infra" class="page">
+  <div class="photo-sec">
+    <div class="photo-sec-bg" style="background-image:url('https://images.unsplash.com/photo-1504309092620-4d0ec726efa4?w=1600&q=80')"></div>
+    <div class="photo-sec-ct">
+      <div class="stag">Instalaciones</div>
+      <h2>Infraestructura Portuaria</h2>
+      <p class="lead">Contamos con instalaciones de primer nivel para el manejo seguro y eficiente de todo tipo de carga en el Puerto de Tampico.</p>
+      <div class="g3">
+        <div class="card"><div class="card-ic">🏗️</div><h3>Patios de Almacenamiento</h3><p>Más de 50,000 m² de patios pavimentados con iluminación y sistemas de drenaje.</p></div>
+        <div class="card"><div class="card-ic">🏢</div><h3>Bodegas Cerradas</h3><p>15,000 m² de bodegas techadas para carga sensible y productos especiales.</p></div>
+        <div class="card"><div class="card-ic">🚜</div><h3>Equipo Especializado</h3><p>Grúas, cargadores frontales, bandas transportadoras y unidades de transporte pesado.</p></div>
+        <div class="card"><div class="card-ic">⚡</div><h3>Subestación Eléctrica</h3><p>Planta de energía propia para garantizar operación continua las 24 horas del día.</p></div>
+        <div class="card"><div class="card-ic">💧</div><h3>Sistema Antiincendio</h3><p>Redes contra incendio certificadas y brigadas de emergencia permanentes.</p></div>
+        <div class="card"><div class="card-ic">📡</div><h3>Sistema de Monitoreo</h3><p>CCTV y sistema de control de acceso integrado para máxima seguridad.</p></div>
+      </div>
+    </div>
+  </div>
+  <div class="sec g2">
+    <div style="border-radius:14px;height:260px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,.12);background-image:url('https://images.unsplash.com/photo-1493946740644-2d8a1f1a6aff?w=900&q=80');background-size:cover;background-position:center"></div>
+    <div>
+      <div class="stag">Capacidad de Almacenamiento</div>
+      <h2>Granel y Carga General</h2>
+      <p class="lead">Nuestras bodegas y patios están equipados para manejar fertilizantes, carbón, granos y mercancías generales. Contamos con equipos de carga frontal y cintas transportadoras de alta capacidad.</p>
+    </div>
+  </div>
+</div>
+
+<div id="page-proyectos" class="page">
+  <div class="ph">
+    <div class="ph-bg" style="background-image:url('https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=1600&q=80')"></div>
+    <div class="ph-ct">
+      <div class="stag">Portafolio</div>
+      <h1>Proyectos Destacados</h1>
+      <p>Conoce algunos de los proyectos más relevantes que hemos gestionado a lo largo de nuestra historia.</p>
+    </div>
+  </div>
+  <div class="sec">
+    <div class="pg">
+      <div class="pc"><div class="ptag">2024</div><h3>Expansión Terminal Norte</h3><p>Ampliación de capacidad de almacenamiento en 30% con nueva infraestructura de patios y equipos de descarga.</p></div>
+      <div class="pc"><div class="ptag">2023</div><h3>Sistema Digital de Citas</h3><p>Implementación de plataforma digital para gestión de citas de carga en la terminal portuaria.</p></div>
+      <div class="pc"><div class="ptag">2022</div><h3>Manejo de Fertilizantes</h3><p>Proyecto de logística integral para distribución nacional de fertilizantes importados vía marítima.</p></div>
+      <div class="pc"><div class="ptag">2021</div><h3>Certificación ISPS</h3><p>Obtención de certificación internacional de seguridad portuaria bajo estándar ISPS Code.</p></div>
+    </div>
+  </div>
+</div>
+
+<div id="page-noticias" class="page">
+  <div class="ph">
+    <div class="ph-bg" style="background-image:url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=1600&q=80')"></div>
+    <div class="ph-ct"><div class="stag">Blog</div><h1>Noticias</h1><p>Mantente informado sobre las novedades de Cooper/T. Smith de México.</p></div>
+  </div>
+  <div class="sec">
+    <div class="ng">
+      <div class="nc">
+        <div class="ni" style="background-image:url('https://images.unsplash.com/photo-1493946740644-2d8a1f1a6aff?w=600&q=70')"><div class="ni-ov"></div></div>
+        <div class="nb"><div class="nd">Mayo 2025</div><h3>Cooper/T. Smith amplía capacidad de almacenamiento</h3><p>La terminal suma 10,000 m² adicionales para atender la creciente demanda de importaciones agrícolas.</p></div>
+      </div>
+      <div class="nc">
+        <div class="ni" style="background-image:url('https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=600&q=70')"><div class="ni-ov"></div></div>
+        <div class="nb"><div class="nd">Marzo 2025</div><h3>Nuevo contrato con naviera internacional</h3><p>Firmamos acuerdo de operaciones exclusivas con una de las principales navieras de América Latina.</p></div>
+      </div>
+      <div class="nc">
+        <div class="ni" style="background-image:url('https://images.unsplash.com/photo-1504309092620-4d0ec726efa4?w=600&q=70')"><div class="ni-ov"></div></div>
+        <div class="nb"><div class="nd">Enero 2025</div><h3>Plan de sustentabilidad ambiental 2025</h3><p>Presentamos nuestro plan para reducir la huella de carbono en un 20% durante este año.</p></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-contacto" class="page">
+  <div class="ph">
+    <div class="ph-bg" style="background-image:url('https://images.unsplash.com/photo-1504309092620-4d0ec726efa4?w=1600&q=80')"></div>
+    <div class="ph-ct"><div class="stag">Comunícate</div><h1>Contacto</h1><p>Estamos disponibles para atender tus consultas y necesidades logísticas.</p></div>
+  </div>
+  <div class="sec">
+    <div class="cg">
+      <div class="ci-wrap">
+        <div class="ci"><div class="ci-ic">📍</div><div><h4>Dirección</h4><p>Zona Portuaria, Puerto de Tampico, Tamaulipas, México</p></div></div>
+        <div class="ci"><div class="ci-ic">📞</div><div><h4>Teléfono</h4><p>+52 833 000 0000</p></div></div>
+        <div class="ci"><div class="ci-ic">✉️</div><div><h4>Email</h4><p>contacto@coopertsmith.com.mx</p></div></div>
+        <div class="ci"><div class="ci-ic">🕐</div><div><h4>Horario</h4><p>Lun–Vie: 8:00–18:00 · Sáb: 9:00–13:00</p></div></div>
+      </div>
+      <div class="cf">
+        <div class="fr">
+          <div class="fl"><label>Nombre</label><input type="text" placeholder="Tu nombre"/></div>
+          <div class="fl"><label>Empresa</label><input type="text" placeholder="Empresa"/></div>
+        </div>
+        <div class="fl"><label>Email</label><input type="email" placeholder="correo@empresa.com"/></div>
+        <div class="fl"><label>Mensaje</label><textarea placeholder="¿En qué podemos ayudarte?"></textarea></div>
+        <button class="btn-green" style="width:100%">Enviar mensaje</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="page-agenda" class="page">
+  <div class="aw">
+    <div class="ab">
+      <h2>Programa tu visita</h2>
+      <p class="sub">Completa el formulario para agendar una cita de carga en la terminal.</p>
+      <div class="fl"><label>Empresa <span>*</span></label><input id="ag-emp" type="text" placeholder="Nombre de la empresa"/></div>
+      <div class="fl"><label>Tipo de Carga <span>*</span></label>
+        <select id="ag-car">
+          <option value="">Selecciona el tipo de carga</option>
+          <option>Carga General</option><option>Fertilizantes</option><option>Carbón</option><option>Granel Sólido</option><option>Granel Líquido</option><option>Contenedores</option><option>Maquinaria Pesada</option>
+        </select>
+      </div>
+      <div class="half">
+        <div class="fl"><label>Fecha <span>*</span></label><div class="ii"><span class="ico">📅</span><input id="ag-fec" type="date"/></div></div>
+        <div class="fl"><label>Horario <span>*</span></label>
+          <select id="ag-hor">
+            <option value="">Selecciona horario</option>
+            <option>08:00 hrs</option><option>09:00 hrs</option><option>10:00 hrs</option><option>11:00 hrs</option><option>12:00 hrs</option><option>13:00 hrs</option><option>14:00 hrs</option><option>15:00 hrs</option><option>16:00 hrs</option>
+          </select>
+        </div>
+      </div>
+      <div class="half">
+        <div class="fl"><label>Nombre de Operador <span>*</span></label><input id="ag-op" type="text" placeholder="Nombre completo"/></div>
+        <div class="fl"><label>Teléfono</label><input id="ag-tel" type="tel" placeholder="+52 833 000 0000"/></div>
+      </div>
+      <div class="fl"><label>Notas adicionales</label><textarea id="ag-not" rows="3" placeholder="Información adicional sobre la carga..."></textarea></div>
+      <div id="ag-err" style="color:#c53030;font-size:12px;margin-bottom:8px;display:none">⚠ Completa todos los campos requeridos.</div>
+      <button class="btn-green" style="width:100%;padding:13px;font-size:14px" onclick="submitAgenda()">Confirmar Cita</button>
+    </div>
+  </div>
+</div>
+
+<div id="page-confirm" class="page">
+  <div class="cfw">
+    <div class="cfb">
+      <div class="cfh">
+        <div><h3>Cooper T.Smith — Confirmación</h3><div class="cfcode" id="cf-code"></div></div>
+        <div class="badge-cf">⏱ Confirmada</div>
+      </div>
+      <div class="cfqr">
+        <div id="qrcanvas"></div>
+        <div class="cfbl" id="cf-bl"></div>
+        <div class="cfhint">Escanea el código QR para ver los detalles de tu cita</div>
+      </div>
+      <div class="cfd" id="cf-det"></div>
+      <div class="cfact">
+        <button class="btn-o2" onclick="window.print()">🖨️ Imprimir</button>
+        <button class="btn-green" onclick="showPage('home')" style="flex:1">Volver al inicio</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<footer id="main-footer">
+  <div class="fg">
+    <div class="fb">
+      <div style="display:flex;align-items:center;gap:9px">
+        <svg viewBox="0 0 50 50" width="30" fill="none" xmlns="http://www.w3.org/2000/svg"><polygon points="25,3 47,25 25,47 3,25" fill="#3d5229" stroke="#fff" stroke-width="1.5"/><polygon points="25,9 41,25 25,41 9,25" fill="none" stroke="#fff" stroke-width="1"/><text x="25" y="31" text-anchor="middle" font-family="Georgia,serif" font-size="18" fill="#fff">C</text></svg>
+        <span style="color:#fff;font-weight:700;font-family:Georgia,serif;font-size:14px">Cooper/T. Smith de México</span>
+      </div>
+      <p>Terminal logística especializada en el manejo de carga portuaria en Tampico, Tamaulipas, México.</p>
+    </div>
+    <div class="fc"><h4>Navegación</h4><a onclick="showPage('home')">Inicio</a><a onclick="showPage('nosotros')">Nosotros</a><a onclick="showPage('infra')">Infraestructura</a><a onclick="showPage('proyectos')">Proyectos</a></div>
+    <div class="fc"><h4>Servicios</h4><a>Carga General</a><a>Fertilizantes</a><a>Carbón</a><a>Granel</a></div>
+    <div class="fc"><h4>Contacto</h4><a>+52 833 000 0000</a><a>contacto@coopertsmith.com.mx</a><a onclick="showPage('contacto')">Formulario</a></div>
+  </div>
+  <div class="fb-bot">
+    <span>© 2025 Cooper/T. Smith de México. Todos los derechos reservados.</span>
+    <span style="color:rgba(255,255,255,.3);font-size:11px">v3.0</span>
+  </div>
+</footer>
+
+<div id="admin-page" class="adm">
+  <div id="adm-login">
+    <div class="lw">
+      <div class="lb">
+        <svg viewBox="0 0 80 80" width="64" fill="none" style="margin:0 auto 16px" xmlns="http://www.w3.org/2000/svg">
+          <polygon points="40,5 75,40 40,75 5,40" fill="#3d5229" stroke="#3d5229"/>
+          <polygon points="40,13 67,40 40,67 13,40" fill="none" stroke="#fff" stroke-width="2"/>
+          <text x="40" y="50" text-anchor="middle" font-family="Georgia,serif" font-size="30" font-weight="bold" fill="#fff">C</text>
+        </svg>
+        <h2>Panel Administrativo</h2>
+        <p>Cooper T.Smith — Gestión de Citas</p>
+        <div id="lerr" class="errmsg">Usuario o contraseña incorrectos.</div>
+        <div class="fl"><label>Usuario</label><input id="lu" type="text" placeholder="admin"/></div>
+        <div class="fl"><label>Contraseña</label><input id="lp" type="password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+        <button class="btn-green" style="width:100%;margin-top:6px;padding:12px" onclick="doLogin()">Iniciar sesión</button>
+        <p style="margin-top:12px;font-size:12px;color:var(--mid)">¿Eres cliente? <a style="color:var(--g1);cursor:pointer" onclick="showMain()">Ir al sitio</a></p>
+      </div>
+    </div>
+  </div>
+  <div id="adm-dash" style="display:none">
+    <div class="an">
+      <div class="anl"><div class="ib">▦</div><div><h2>Panel Administrativo</h2><p>Cooper T.Smith — Gestión de Citas</p></div></div>
+      <div class="anr">
+        <button class="bsm" onclick="refreshAdmin()">↻ Actualizar</button>
+        <button class="bsm" onclick="exportCSV()">⬇ Exportar CSV</button>
+        <button class="bsm dng" onclick="showMain()">→ Salir</button>
+      </div>
+    </div>
+    <div class="atabs">
+      <div class="tab active" id="tab-d" onclick="switchTab('d')">▦ Dashboard</div>
+      <div class="tab" id="tab-c" onclick="switchTab('c')">≡ Citas</div>
+    </div>
+    <div class="ac">
+      <div id="dash-tab">
+        <div class="scards" id="scards"></div>
+        <div class="charts-row">
+          <div class="chart-box"><h3>📊 Citas por tipo de carga</h3><canvas id="chartCarga"></canvas></div>
+          <div class="chart-box"><h3>📈 Citas por estado</h3><canvas id="chartEstado"></canvas></div>
+        </div>
+        <div class="charts-row" style="grid-template-columns:1fr">
+          <div class="chart-box"><h3>📅 Citas por fecha próximas</h3><canvas id="chartFecha" style="max-height:160px"></canvas></div>
+        </div>
+      </div>
+      <div id="citas-tab">
+        <div class="scards" id="scards2"></div>
+        <div class="tcontrols">
+          <div class="si"><span class="ico">🔍</span><input id="srch" type="text" placeholder="Buscar por empresa, código o contacto..." oninput="renderTable()"/></div>
+          <select class="fsel" id="fst" onchange="renderTable()"><option value="">Todos</option><option>Confirmada</option><option>Pendiente</option><option>Completada</option><option>Cancelada</option></select>
+          <button class="bdt" onclick="toggleDF()">📅 Filtrar fecha</button>
+          <input type="date" id="dfl" style="display:none;padding:8px 11px;border:1px solid var(--bd);border-radius:7px;font-size:12px" onchange="renderTable()"/>
+        </div>
+        <div class="tw">
+          <table><thead><tr><th>Código</th><th>Empresa</th><th>Carga</th><th>Fecha</th><th>Hora</th><th>Estado</th><th>Acciones</th></tr></thead>
+          <tbody id="ctbody"></tbody></table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mov" id="mov" onclick="closeMod(event)">
+  <div class="mo">
+    <h3 id="mot"></h3><div class="mosub" id="mos"></div>
+    <div id="mob"></div>
+    <div class="mact"><button class="btn-o2" onclick="closeMod()">Cerrar</button></div>
+  </div>
+</div>
+
+<script>
+let citas=[];
+try{citas=JSON.parse(localStorage.getItem('cts_v3')||'[]');}catch(e){citas=[];}
+if(!citas.length){
+  citas=[
+    {code:'CTS-8A4IT562',empresa:'uouout',operador:'Ikkwjdkawkcjas',tel:'+52 833 111 1111',carga:'Carga General',fecha:'2026-05-28',hora:'14:00 hrs',notas:'',status:'Confirmada'},
+    {code:'CTS-P09Z2Q8Z',empresa:'Maeva',operador:'Rocío Román Redondo',tel:'+52 833 222 2222',carga:'Fertilizantes',fecha:'2026-05-20',hora:'11:00 hrs',notas:'',status:'Confirmada'},
+    {code:'CTS-E0P8QJKX',empresa:'Maeva',operador:'Rocío Román Redondo',tel:'+52 833 222 2222',carga:'Fertilizantes',fecha:'2026-05-20',hora:'12:00 hrs',notas:'',status:'Confirmada'},
+    {code:'CTS-96GHIAW2',empresa:'Ayo',operador:'Nataniel Miranda',tel:'+52 833 333 3333',carga:'Carbón',fecha:'2026-05-29',hora:'12:00 hrs',notas:'',status:'Confirmada'},
+    {code:'CTS-QNLYNUGI',empresa:'Ram',operador:'Sabes a',tel:'+52 833 444 4444',carga:'Carbón',fecha:'2026-05-29',hora:'14:00 hrs',notas:'',status:'Confirmada'},
+    {code:'CTS-A1B2C3D4',empresa:'TransMex',operador:'Carlos García',tel:'+52 833 555 5555',carga:'Granel Sólido',fecha:'2026-05-15',hora:'09:00 hrs',notas:'Traer documentación',status:'Completada'},
+    {code:'CTS-X9Y8Z7W6',empresa:'LogiPort',operador:'Ana Martínez',tel:'+52 833 666 6666',carga:'Granel Líquido',fecha:'2026-05-30',hora:'10:00 hrs',notas:'',status:'Confirmada'},
+    {code:'CTS-M3N4O5P6',empresa:'AgroMar',operador:'Luis Pérez',tel:'+52 833 777 7777',carga:'Fertilizantes',fecha:'2026-06-02',hora:'08:00 hrs',notas:'Carga sensible',status:'Pendiente'},
+    {code:'CTS-Q7R8S9T0',empresa:'CarbonMex',operador:'María López',tel:'+52 833 888 8888',carga:'Carbón',fecha:'2026-06-05',hora:'13:00 hrs',notas:'',status:'Pendiente'},
+    {code:'CTS-U1V2W3X4',empresa:'ImportEx',operador:'Jorge Ramírez',tel:'+52 833 999 9999',carga:'Carga General',fecha:'2026-05-10',hora:'11:00 hrs',notas:'',status:'Completada'}
+  ];
+  saveCitas();
+}
+function saveCitas(){try{localStorage.setItem('cts_v3',JSON.stringify(citas));}catch(e){}}
+function genCode(){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';let r='CTS-';for(let i=0;i<8;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
+
+function showPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  const el=document.getElementById('page-'+p);if(el)el.classList.add('active');
+  document.getElementById('main-nav').style.display='flex';
+  document.getElementById('main-footer').style.display='block';
+  document.getElementById('admin-page').classList.remove('active');
+  window.scrollTo(0,0);
+}
+function showAdminLogin(){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.getElementById('main-nav').style.display='none';
+  document.getElementById('main-footer').style.display='none';
+  document.getElementById('admin-page').classList.add('active');
+  document.getElementById('adm-login').style.display='block';
+  document.getElementById('adm-dash').style.display='none';
+}
+function showMain(){
+  document.getElementById('admin-page').classList.remove('active');
+  document.getElementById('main-nav').style.display='flex';
+  document.getElementById('main-footer').style.display='block';
+  showPage('home');
+}
+
+function doLogin(){
+  if(document.getElementById('lu').value==='admin'&&document.getElementById('lp').value==='admin123'){
+    document.getElementById('lerr').style.display='none';
+    document.getElementById('adm-login').style.display='none';
+    document.getElementById('adm-dash').style.display='block';
+    renderStats();renderStats2();renderTable();renderCharts();
+  }else{document.getElementById('lerr').style.display='block';}
+}
+
+function submitAgenda(){
+  const emp=document.getElementById('ag-emp').value.trim();
+  const car=document.getElementById('ag-car').value;
+  const fec=document.getElementById('ag-fec').value;
+  const hor=document.getElementById('ag-hor').value;
+  const op=document.getElementById('ag-op').value.trim();
+  const tel=document.getElementById('ag-tel').value.trim();
+  const not=document.getElementById('ag-not').value.trim();
+  if(!emp||!car||!fec||!hor||!op){document.getElementById('ag-err').style.display='block';return;}
+  document.getElementById('ag-err').style.display='none';
+  const c={code:genCode(),empresa:emp,operador:op,tel,carga:car,fecha:fec,hora:hor,notas:not,status:'Confirmada'};
+  citas.unshift(c);saveCitas();
+  showConfirm(c);
+  ['ag-emp','ag-op','ag-tel','ag-not'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('ag-car').value='';document.getElementById('ag-fec').value='';document.getElementById('ag-hor').value='';
+}
+
+function showConfirm(c){
+  document.getElementById('cf-code').textContent=c.code;
+  document.getElementById('cf-bl').textContent=c.code;
+  const el=document.getElementById('qrcanvas');
+  el.innerHTML='';
+  const qrText=`COOPER T.SMITH\nCodigo: ${c.code}\nEmpresa: ${c.empresa}\nCarga: ${c.carga}\nFecha: ${c.fecha}\nHora: ${c.hora}\nOperador: ${c.operador}\nTel: ${c.tel}\nEstado: ${c.status}`;
+  try{
+    QRCode.toCanvas(document.createElement('canvas'),qrText,{width:190,margin:2,color:{dark:'#1e2914',light:'#ffffff'}},function(err,canvas){
+      if(err){fallbackQR(el,c);return;}
+      canvas.style.cssText='border-radius:6px;display:block;margin:0 auto';
+      el.appendChild(canvas);
+    });
+  }catch(e){fallbackQR(el,c);}
+  const dets=[['🏢','Empresa',c.empresa],['📦','Tipo de Carga',c.carga],['📅','Fecha',c.fecha],['🕐','Horario',c.hora],['👤','Operador',c.operador],['📞','Teléfono',c.tel||'—'],['📝','Notas',c.notas||'—']];
+  document.getElementById('cf-det').innerHTML=dets.map(([i,l,v])=>`<div class="dr"><div class="di">${i}</div><div><div class="dl">${l}</div><div class="dv">${v}</div></div></div>`).join('');
+  showPage('confirm');
+}
+function fallbackQR(el,c){
+  const t=encodeURIComponent(`${c.code}|${c.empresa}|${c.carga}|${c.fecha}|${c.hora}`);
+  const img=document.createElement('img');
+  img.src=`https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=${t}&color=1e2914&bgcolor=ffffff&margin=8`;
+  img.style.cssText='width:190px;height:190px;border-radius:6px;display:block;margin:0 auto';
+  el.appendChild(img);
+}
+
+function renderStats(){
+  const t=citas.length,pe=citas.filter(c=>c.status==='Pendiente').length,co=citas.filter(c=>c.status==='Confirmada').length,cm=citas.filter(c=>c.status==='Completada').length;
+  const h=`<div class="scard"><div class="scard-ic gr">📅</div><h3>${t}</h3><p>Total Citas</p></div>
+    <div class="scard"><div class="scard-ic y">⏱</div><h3>${pe}</h3><p>Pendientes</p></div>
+    <div class="scard"><div class="scard-ic b">⏺</div><h3>${co}</h3><p>Confirmadas</p></div>
+    <div class="scard"><div class="scard-ic g">✔</div><h3>${cm}</h3><p>Completadas</p></div>`;
+  document.getElementById('scards').innerHTML=h;
+}
+function renderStats2(){document.getElementById('scards2').innerHTML=document.getElementById('scards').innerHTML;}
+
+let charts={};
+function renderCharts(){
+  const tipos={};citas.forEach(c=>{tipos[c.carga]=(tipos[c.carga]||0)+1;});
+  buildChart('chartCarga','bar',Object.keys(tipos),Object.values(tipos),['#3d5229','#2e3d1e','#1e2914','#4a6b34','#5a7f40','#6e9450','#8aae68']);
+  const estados={Confirmada:0,Pendiente:0,Completada:0,Cancelada:0};
+  citas.forEach(c=>{if(estados[c.status]!==undefined)estados[c.status]++;});
+  buildChart('chartEstado','doughnut',Object.keys(estados),Object.values(estados),['#3b82f6','#f59e0b','#10b981','#ef4444']);
+  const fechas={};
+  citas.slice().sort((a,b)=>a.fecha.localeCompare(b.fecha)).forEach(c=>{fechas[c.fecha]=(fechas[c.fecha]||0)+1;});
+  const fKeys=Object.keys(fechas).slice(-8);
+  buildChart('chartFecha','line',fKeys,fKeys.map(k=>fechas[k]),['#3d5229']);
+}
+function buildChart(id,type,labels,data,colors){
+  if(charts[id]){charts[id].destroy();}
+  const ctx=document.getElementById(id);if(!ctx)return;
+  charts[id]=new Chart(ctx,{
+    type,
+    data:{labels,datasets:[{data,backgroundColor:type==='line'?'rgba(61,82,41,0.15)':colors,borderColor:type==='line'?'#3d5229':colors,borderWidth:type==='line'?2:0,fill:type==='line',tension:0.4,pointBackgroundColor:'#3d5229',pointRadius:4}]},
+    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:type==='doughnut',position:'right',labels:{font:{size:11},boxWidth:12}}},scales:type!=='doughnut'?{y:{beginAtZero:true,ticks:{stepSize:1,font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{size:10}},grid:{display:false}}}:{}}
+  });
+}
+function refreshAdmin(){renderStats();renderStats2();renderTable();renderCharts();}
+
+function renderTable(){
+  const q=(document.getElementById('srch').value||'').toLowerCase();
+  const st=document.getElementById('fst').value;
+  const dt=document.getElementById('dfl').value;
+  const filtered=citas.filter(c=>{
+    const mq=!q||(c.empresa.toLowerCase().includes(q)||c.code.toLowerCase().includes(q)||c.operador.toLowerCase().includes(q));
+    return mq&&(!st||c.status===st)&&(!dt||c.fecha===dt);
+  });
+  document.getElementById('ctbody').innerHTML=filtered.map((c,i)=>`
+    <tr>
+      <td><code style="font-size:11px;color:var(--mid);font-weight:600">${c.code}</code></td>
+      <td><div style="font-weight:700;font-size:12px">${c.empresa}</div><div class="csub">${c.operador}</div></td>
+      <td>${c.carga}</td><td>${c.fecha}</td><td>${c.hora}</td>
+      <td>
+        <span class="badge ${c.status.toLowerCase()}">${stIco(c.status)} ${c.status}</span>
+        <select class="ssel" onchange="chSt('${c.code}',this.value)">
+          <option ${c.status==='Confirmada'?'selected':''}>Confirmada</option>
+          <option ${c.status==='Pendiente'?'selected':''}>Pendiente</option>
+          <option ${c.status==='Completada'?'selected':''}>Completada</option>
+          <option ${c.status==='Cancelada'?'selected':''}>Cancelada</option>
+        </select>
+      </td>
+      <td><div class="am"><button class="db" onclick="togDD('dr${i}')">•••</button>
+        <div class="dd" id="dr${i}">
+          <button onclick="viewDet('${c.code}')">👁 Ver detalle</button>
+          <button class="del" onclick="delCita('${c.code}')">🗑 Eliminar</button>
+        </div></div></td>
+    </tr>`).join('');
+}
+function stIco(s){return s==='Confirmada'?'⏺':s==='Pendiente'?'⏱':s==='Completada'?'✔':'✕';}
+function chSt(code,st){const c=citas.find(x=>x.code===code);if(c){c.status=st;saveCitas();renderTable();renderStats();renderStats2();renderCharts();}}
+function delCita(code){if(confirm('¿Eliminar esta cita?')){citas=citas.filter(c=>c.code!==code);saveCitas();renderTable();renderStats();renderStats2();renderCharts();}}
+function viewDet(code){
+  const c=citas.find(x=>x.code===code);if(!c)return;
+  document.getElementById('mot').textContent=c.code;
+  document.getElementById('mos').textContent=`${c.empresa} — ${c.status}`;
+  document.getElementById('mob').innerHTML=`<div style="display:grid;gap:8px">${[['🏢','Empresa',c.empresa],['📦','Carga',c.carga],['📅','Fecha',c.fecha],['🕐','Hora',c.hora],['👤','Operador',c.operador],['📞','Teléfono',c.tel||'—'],['📝','Notas',c.notas||'—'],['✔','Estado',c.status]].map(([i,l,v])=>`<div style="display:flex;gap:9px;align-items:center;padding:8px;background:#f5f5f5;border-radius:7px"><span style="font-size:16px">${i}</span><div><div style="font-size:10px;color:var(--mid);text-transform:uppercase">${l}</div><div style="font-weight:700;font-size:13px">${v}</div></div></div>`).join('')}</div>`;
+  document.getElementById('mov').classList.add('open');
+}
+function togDD(id){document.querySelectorAll('.dd').forEach(d=>{if(d.id!==id)d.classList.remove('open');});document.getElementById(id).classList.toggle('open');}
+document.addEventListener('click',e=>{if(!e.target.closest('.am'))document.querySelectorAll('.dd').forEach(d=>d.classList.remove('open'));});
+function closeMod(e){if(!e||e.target===document.getElementById('mov'))document.getElementById('mov').classList.remove('open');}
+function toggleDF(){const el=document.getElementById('dfl');el.style.display=el.style.display==='none'?'block':'none';}
+function switchTab(t){
+  document.getElementById('dash-tab').style.display=t==='d'?'block':'none';
+  document.getElementById('citas-tab').style.display=t==='c'?'block':'none';
+  document.getElementById('tab-d').classList.toggle('active',t==='d');
+  document.getElementById('tab-c').classList.toggle('active',t==='c');
+  if(t==='d')setTimeout(renderCharts,50);
+}
+function exportCSV(){
+  const h='Código,Empresa,Operador,Teléfono,Carga,Fecha,Hora,Estado,Notas\n';
+  const r=citas.map(c=>`${c.code},"${c.empresa}","${c.operador}","${c.tel}","${c.carga}",${c.fecha},${c.hora},${c.status},"${c.notas}"`).join('\n');
+  const b=new Blob([h+r],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='citas-cooper.csv';a.click();
+}
+</script>
+</body>
+</html>
