@@ -4,18 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Cooper T. Smith de México</title>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js">document.addEventListener('DOMContentLoaded',function(){
-  citas=citas.map(normalizeCita);
-  saveCitas();
-  handleScanFromUrl();
-});
-</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">document.addEventListener('DOMContentLoaded',function(){
-  citas=citas.map(normalizeCita);
-  saveCitas();
-  handleScanFromUrl();
-});
-</script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--g1:#3d5229;--g2:#2e3d1e;--g3:#1e2914;--gl:#e8ecdf;--gray:#dedede;--dark:#1a1a1a;--mid:#5a5a5a;--bd:#c8c8c8;--white:#fff}
@@ -165,9 +155,7 @@ td{padding:12px 14px;font-size:12px;border-bottom:1px solid #f5f5f5;vertical-ali
 tr:last-child td{border-bottom:none}
 tr:hover td{background:#fafafa}
 .badge{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700}
-.badge.confirmada{background:#dbeafe;color:#1e40af}
-.badge.enproceso{background:#fef9c3;color:#854d0e}
-.badge.completada{background:#dcfce7;color:#14532d}
+.badge.confirmada{background:#dbeafe;color:#1e40af}.badge.pendiente{background:#fef9c3;color:#854d0e}.badge.completada{background:#dcfce7;color:#14532d}.badge.cancelada{background:#fee2e2;color:#991b1b}
 .am{position:relative;display:inline-block}
 .db{background:none;border:none;cursor:pointer;font-size:16px;padding:3px 7px;border-radius:5px;color:var(--mid)}.db:hover{background:#f0f0f0}
 .dd{position:absolute;right:0;top:24px;background:var(--white);border:1px solid var(--bd);border-radius:7px;min-width:148px;box-shadow:0 4px 16px rgba(0,0,0,.1);z-index:50;display:none}
@@ -512,12 +500,7 @@ tr:hover td{background:#fafafa}
         <div class="scards" id="scards2"></div>
         <div class="tcontrols">
           <div class="si"><span class="ico">🔍</span><input id="srch" type="text" placeholder="Buscar por empresa, código o contacto..." oninput="renderTable()"/></div>
-          <select class="fsel" id="fst" onchange="renderTable()">
-  <option value="">Todos</option>
-  <option>Confirmada</option>
-  <option>En proceso</option>
-  <option>Completada</option>
-</select>
+          <select class="fsel" id="fst" onchange="renderTable()"><option value="">Todos</option><option>Confirmada</option><option>Pendiente</option><option>Completada</option><option>Cancelada</option></select>
           <button class="bdt" onclick="toggleDF()">📅 Filtrar fecha</button>
           <input type="date" id="dfl" style="display:none;padding:8px 11px;border:1px solid var(--bd);border-radius:7px;font-size:12px" onchange="renderTable()"/>
         </div>
@@ -543,16 +526,16 @@ let citas=[];
 try{citas=JSON.parse(localStorage.getItem('cts_v3')||'[]');}catch(e){citas=[];}
 if(!citas.length){
   citas=[
-    {code:'CTS-8A4IT562',empresa:'uouout',operador:'Ikkwjdkawkcjas',tel:'+52 833 111 1111',carga:'Carga General',fecha:'2026-05-28',hora:'14:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-P09Z2Q8Z',empresa:'Maeva',operador:'Rocío Román Redondo',tel:'+52 833 222 2222',carga:'Fertilizantes',fecha:'2026-05-20',hora:'11:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-E0P8QJKX',empresa:'Maeva',operador:'Rocío Román Redondo',tel:'+52 833 222 2222',carga:'Fertilizantes',fecha:'2026-05-20',hora:'12:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-96GHIAW2',empresa:'Ayo',operador:'Nataniel Miranda',tel:'+52 833 333 3333',carga:'Carbón',fecha:'2026-05-29',hora:'12:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-QNLYNUGI',empresa:'Ram',operador:'Sabes a',tel:'+52 833 444 4444',carga:'Carbón',fecha:'2026-05-29',hora:'14:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-A1B2C3D4',empresa:'TransMex',operador:'Carlos García',tel:'+52 833 555 5555',carga:'Granel Sólido',fecha:'2026-05-15',hora:'09:00 hrs',notas:'Traer documentación',status:'Completada',scanCount:2},
-    {code:'CTS-X9Y8Z7W6',empresa:'LogiPort',operador:'Ana Martínez',tel:'+52 833 666 6666',carga:'Granel Líquido',fecha:'2026-05-30',hora:'10:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-M3N4O5P6',empresa:'AgroMar',operador:'Luis Pérez',tel:'+52 833 777 7777',carga:'Fertilizantes',fecha:'2026-06-02',hora:'08:00 hrs',notas:'Carga sensible',status:'En proceso',scanCount:1},
-    {code:'CTS-Q7R8S9T0',empresa:'CarbonMex',operador:'María López',tel:'+52 833 888 8888',carga:'Carbón',fecha:'2026-06-05',hora:'13:00 hrs',notas:'',status:'En proceso',scanCount:1},
-    {code:'CTS-U1V2W3X4',empresa:'ImportEx',operador:'Jorge Ramírez',tel:'+52 833 999 9999',carga:'Carga General',fecha:'2026-05-10',hora:'11:00 hrs',notas:'',status:'Completada',scanCount:2}
+    {code:'CTS-8A4IT562',empresa:'uouout',operador:'Ikkwjdkawkcjas',tel:'+52 833 111 1111',carga:'Carga General',fecha:'2026-05-28',hora:'14:00 hrs',notas:'',status:'Confirmada'},
+    {code:'CTS-P09Z2Q8Z',empresa:'Maeva',operador:'Rocío Román Redondo',tel:'+52 833 222 2222',carga:'Fertilizantes',fecha:'2026-05-20',hora:'11:00 hrs',notas:'',status:'Confirmada'},
+    {code:'CTS-E0P8QJKX',empresa:'Maeva',operador:'Rocío Román Redondo',tel:'+52 833 222 2222',carga:'Fertilizantes',fecha:'2026-05-20',hora:'12:00 hrs',notas:'',status:'Confirmada'},
+    {code:'CTS-96GHIAW2',empresa:'Ayo',operador:'Nataniel Miranda',tel:'+52 833 333 3333',carga:'Carbón',fecha:'2026-05-29',hora:'12:00 hrs',notas:'',status:'Confirmada'},
+    {code:'CTS-QNLYNUGI',empresa:'Ram',operador:'Sabes a',tel:'+52 833 444 4444',carga:'Carbón',fecha:'2026-05-29',hora:'14:00 hrs',notas:'',status:'Confirmada'},
+    {code:'CTS-A1B2C3D4',empresa:'TransMex',operador:'Carlos García',tel:'+52 833 555 5555',carga:'Granel Sólido',fecha:'2026-05-15',hora:'09:00 hrs',notas:'Traer documentación',status:'Completada'},
+    {code:'CTS-X9Y8Z7W6',empresa:'LogiPort',operador:'Ana Martínez',tel:'+52 833 666 6666',carga:'Granel Líquido',fecha:'2026-05-30',hora:'10:00 hrs',notas:'',status:'Confirmada'},
+    {code:'CTS-M3N4O5P6',empresa:'AgroMar',operador:'Luis Pérez',tel:'+52 833 777 7777',carga:'Fertilizantes',fecha:'2026-06-02',hora:'08:00 hrs',notas:'Carga sensible',status:'Pendiente'},
+    {code:'CTS-Q7R8S9T0',empresa:'CarbonMex',operador:'María López',tel:'+52 833 888 8888',carga:'Carbón',fecha:'2026-06-05',hora:'13:00 hrs',notas:'',status:'Pendiente'},
+    {code:'CTS-U1V2W3X4',empresa:'ImportEx',operador:'Jorge Ramírez',tel:'+52 833 999 9999',carga:'Carga General',fecha:'2026-05-10',hora:'11:00 hrs',notas:'',status:'Completada'}
   ];
   saveCitas();
 }
@@ -601,7 +584,7 @@ function submitAgenda(){
   const not=document.getElementById('ag-not').value.trim();
   if(!emp||!car||!fec||!hor||!op){document.getElementById('ag-err').style.display='block';return;}
   document.getElementById('ag-err').style.display='none';
-  const c={code:genCode(),empresa:emp,operador:op,tel,carga:car,fecha:fec,hora:hor,notas:not,status:'Confirmada',scanCount:0};
+  const c={code:genCode(),empresa:emp,operador:op,tel,carga:car,fecha:fec,hora:hor,notas:not,status:'Confirmada'};
   citas.unshift(c);saveCitas();
   showConfirm(c);
   ['ag-emp','ag-op','ag-tel','ag-not'].forEach(id=>document.getElementById(id).value='');
@@ -626,7 +609,7 @@ function showConfirm(c){
   showPage('confirm');
 }
 function fallbackQR(el,c){
-  const t=encodeURIComponent(buildQrUrl(c));
+  const t=encodeURIComponent(`${c.code}|${c.empresa}|${c.carga}|${c.fecha}|${c.hora}`);
   const img=document.createElement('img');
   img.src=`https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=${t}&color=1e2914&bgcolor=ffffff&margin=8`;
   img.style.cssText='width:190px;height:190px;border-radius:6px;display:block;margin:0 auto';
@@ -634,13 +617,10 @@ function fallbackQR(el,c){
 }
 
 function renderStats(){
-  const t=citas.length;
-  const co=citas.filter(c=>c.status==='Confirmada').length;
-  const ep=citas.filter(c=>c.status==='En proceso').length;
-  const cm=citas.filter(c=>c.status==='Completada').length;
+  const t=citas.length,pe=citas.filter(c=>c.status==='Pendiente').length,co=citas.filter(c=>c.status==='Confirmada').length,cm=citas.filter(c=>c.status==='Completada').length;
   const h=`<div class="scard"><div class="scard-ic gr">📅</div><h3>${t}</h3><p>Total Citas</p></div>
+    <div class="scard"><div class="scard-ic y">⏱</div><h3>${pe}</h3><p>Pendientes</p></div>
     <div class="scard"><div class="scard-ic b">⏺</div><h3>${co}</h3><p>Confirmadas</p></div>
-    <div class="scard"><div class="scard-ic y">⏱</div><h3>${ep}</h3><p>En proceso</p></div>
     <div class="scard"><div class="scard-ic g">✔</div><h3>${cm}</h3><p>Completadas</p></div>`;
   document.getElementById('scards').innerHTML=h;
 }
@@ -650,9 +630,9 @@ let charts={};
 function renderCharts(){
   const tipos={};citas.forEach(c=>{tipos[c.carga]=(tipos[c.carga]||0)+1;});
   buildChart('chartCarga','bar',Object.keys(tipos),Object.values(tipos),['#3d5229','#2e3d1e','#1e2914','#4a6b34','#5a7f40','#6e9450','#8aae68']);
-  const estados={Confirmada:0,'En proceso':0,Completada:0};
+  const estados={Confirmada:0,Pendiente:0,Completada:0,Cancelada:0};
   citas.forEach(c=>{if(estados[c.status]!==undefined)estados[c.status]++;});
-  buildChart('chartEstado','doughnut',Object.keys(estados),Object.values(estados),['#3b82f6','#f59e0b','#10b981']);
+  buildChart('chartEstado','doughnut',Object.keys(estados),Object.values(estados),['#3b82f6','#f59e0b','#10b981','#ef4444']);
   const fechas={};
   citas.slice().sort((a,b)=>a.fecha.localeCompare(b.fecha)).forEach(c=>{fechas[c.fecha]=(fechas[c.fecha]||0)+1;});
   const fKeys=Object.keys(fechas).slice(-8);
@@ -683,18 +663,22 @@ function renderTable(){
       <td><div style="font-weight:700;font-size:12px">${c.empresa}</div><div class="csub">${c.operador}</div></td>
       <td>${c.carga}</td><td>${c.fecha}</td><td>${c.hora}</td>
       <td>
-        <span class="badge ${statusClass(c.status)}">${stIco(c.status)} ${c.status}</span>
-        <div class="csub">${c.scanCount||0} escaneo(s)</div>
+        <span class="badge ${c.status.toLowerCase()}">${stIco(c.status)} ${c.status}</span>
+        <select class="ssel" onchange="chSt('${c.code}',this.value)">
+          <option ${c.status==='Confirmada'?'selected':''}>Confirmada</option>
+          <option ${c.status==='Pendiente'?'selected':''}>Pendiente</option>
+          <option ${c.status==='Completada'?'selected':''}>Completada</option>
+          <option ${c.status==='Cancelada'?'selected':''}>Cancelada</option>
+        </select>
       </td>
       <td><div class="am"><button class="db" onclick="togDD('dr${i}')">•••</button>
         <div class="dd" id="dr${i}">
           <button onclick="viewDet('${c.code}')">👁 Ver detalle</button>
-          <button onclick="simulateScan('${c.code}')">📷 Simular escaneo</button>
           <button class="del" onclick="delCita('${c.code}')">🗑 Eliminar</button>
         </div></div></td>
     </tr>`).join('');
 }
-function stIco(s){return s==='Confirmada'?'⏺':s==='En proceso'?'⏱':s==='Completada'?'✔':'•';}
+function stIco(s){return s==='Confirmada'?'⏺':s==='Pendiente'?'⏱':s==='Completada'?'✔':'✕';}
 function chSt(code,st){const c=citas.find(x=>x.code===code);if(c){c.status=st;saveCitas();renderTable();renderStats();renderStats2();renderCharts();}}
 function delCita(code){if(confirm('¿Eliminar esta cita?')){citas=citas.filter(c=>c.code!==code);saveCitas();renderTable();renderStats();renderStats2();renderCharts();}}
 function viewDet(code){
@@ -720,11 +704,6 @@ function exportCSV(){
   const r=citas.map(c=>`${c.code},"${c.empresa}","${c.operador}","${c.tel}","${c.carga}",${c.fecha},${c.hora},${c.status},"${c.notas}"`).join('\n');
   const b=new Blob([h+r],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='citas-cooper.csv';a.click();
 }
-document.addEventListener('DOMContentLoaded',function(){
-  citas=citas.map(normalizeCita);
-  saveCitas();
-  handleScanFromUrl();
-});
 </script>
 </body>
 </html>
