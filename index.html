@@ -4,18 +4,8 @@
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <title>Cooper T. Smith de México</title>
-<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js">document.addEventListener('DOMContentLoaded',function(){
-  citas=citas.map(normalizeCita);
-  saveCitas();
-  handleScanFromUrl();
-});
-</script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js">document.addEventListener('DOMContentLoaded',function(){
-  citas=citas.map(normalizeCita);
-  saveCitas();
-  handleScanFromUrl();
-});
-</script>
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--g1:#3d5229;--g2:#2e3d1e;--g3:#1e2914;--gl:#e8ecdf;--gray:#dedede;--dark:#1a1a1a;--mid:#5a5a5a;--bd:#c8c8c8;--white:#fff}
@@ -720,6 +710,7 @@ function exportCSV(){
   const r=citas.map(c=>`${c.code},"${c.empresa}","${c.operador}","${c.tel}","${c.carga}",${c.fecha},${c.hora},${c.status},"${c.notas}"`).join('\n');
   const b=new Blob([h+r],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='citas-cooper.csv';a.click();
 }
+
 document.addEventListener('DOMContentLoaded',function(){
   citas=citas.map(normalizeCita);
   saveCitas();
