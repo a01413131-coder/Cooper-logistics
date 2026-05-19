@@ -529,190 +529,663 @@ tr:hover td{background:#fafafa}
 </div>
 
 <script>
-let citas=[];
-try{citas=JSON.parse(localStorage.getItem('cts_v3')||'[]');}catch(e){citas=[];}
-if(!citas.length){
-  citas=[
-    {code:'CTS-8A4IT562',empresa:'uouout',operador:'Ikkwjdkawkcjas',tel:'+52 833 111 1111',carga:'Carga General',fecha:'2026-05-28',hora:'14:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-P09Z2Q8Z',empresa:'Maeva',operador:'Rocío Román Redondo',tel:'+52 833 222 2222',carga:'Fertilizantes',fecha:'2026-05-20',hora:'11:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-E0P8QJKX',empresa:'Maeva',operador:'Rocío Román Redondo',tel:'+52 833 222 2222',carga:'Fertilizantes',fecha:'2026-05-20',hora:'12:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-96GHIAW2',empresa:'Ayo',operador:'Nataniel Miranda',tel:'+52 833 333 3333',carga:'Carbón',fecha:'2026-05-29',hora:'12:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-QNLYNUGI',empresa:'Ram',operador:'Sabes a',tel:'+52 833 444 4444',carga:'Carbón',fecha:'2026-05-29',hora:'14:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-A1B2C3D4',empresa:'TransMex',operador:'Carlos García',tel:'+52 833 555 5555',carga:'Granel Sólido',fecha:'2026-05-15',hora:'09:00 hrs',notas:'Traer documentación',status:'Completada',scanCount:2},
-    {code:'CTS-X9Y8Z7W6',empresa:'LogiPort',operador:'Ana Martínez',tel:'+52 833 666 6666',carga:'Granel Líquido',fecha:'2026-05-30',hora:'10:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-M3N4O5P6',empresa:'AgroMar',operador:'Luis Pérez',tel:'+52 833 777 7777',carga:'Fertilizantes',fecha:'2026-06-02',hora:'08:00 hrs',notas:'Carga sensible',status:'En proceso',scanCount:1},
-    {code:'CTS-Q7R8S9T0',empresa:'CarbonMex',operador:'María López',tel:'+52 833 888 8888',carga:'Carbón',fecha:'2026-06-05',hora:'13:00 hrs',notas:'',status:'En proceso',scanCount:1},
-    {code:'CTS-U1V2W3X4',empresa:'ImportEx',operador:'Jorge Ramírez',tel:'+52 833 999 9999',carga:'Carga General',fecha:'2026-05-10',hora:'11:00 hrs',notas:'',status:'Completada',scanCount:2}
+// ==========================================================
+// COOPER LOGISTICS - LOGICA ESTABLE
+// Estados: Confirmada -> En proceso -> Completada
+// ==========================================================
+
+const STORAGE_KEY = 'cts_v3';
+let citas = [];
+
+try {
+  citas = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+  if (!Array.isArray(citas)) citas = [];
+} catch(e) {
+  citas = [];
+}
+
+if (!citas.length) {
+  citas = [
+    {code:'CTS-8A4IT562',empresa:'TransMex',operador:'Carlos García',tel:'+52 833 111 1111',carga:'Carga General',fecha:'2026-05-28',hora:'14:00 hrs',notas:'',status:'Confirmada',scanCount:0},
+    {code:'CTS-P09Z2Q8Z',empresa:'Maeva',operador:'Rocío Román Redondo',tel:'+52 833 222 2222',carga:'Fertilizantes',fecha:'2026-05-20',hora:'11:00 hrs',notas:'',status:'En proceso',scanCount:1},
+    {code:'CTS-A1B2C3D4',empresa:'ImportEx',operador:'Luis Pérez',tel:'+52 833 333 3333',carga:'Carbón',fecha:'2026-05-15',hora:'09:00 hrs',notas:'',status:'Completada',scanCount:2}
   ];
   saveCitas();
 }
-function saveCitas(){try{localStorage.setItem('cts_v3',JSON.stringify(citas));}catch(e){}}
-function genCode(){const c='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';let r='CTS-';for(let i=0;i<8;i++)r+=c[Math.floor(Math.random()*c.length)];return r;}
+
+function esc(v){
+  return String(v ?? '').replace(/[&<>"']/g, m => ({
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    '"':'&quot;',
+    "'":'&#039;'
+  }[m]));
+}
+
+function saveCitas(){
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(citas));
+  } catch(e) {}
+}
+
+function genCode(){
+  const chars='ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  let r='CTS-';
+  for(let i=0;i<8;i++) r += chars[Math.floor(Math.random()*chars.length)];
+  return r;
+}
+
+function normalizeCita(c){
+  if(!c || typeof c !== 'object') return null;
+
+  if(c.status === 'Pendiente') {
+    c.status = 'En proceso';
+    c.scanCount = 1;
+  }
+
+  if(c.status === 'Cancelada') {
+    c.status = 'Confirmada';
+    c.scanCount = 0;
+  }
+
+  if(!['Confirmada','En proceso','Completada'].includes(c.status)) {
+    c.status = 'Confirmada';
+  }
+
+  if(c.scanCount === undefined || c.scanCount === null || isNaN(Number(c.scanCount))) {
+    if(c.status === 'Completada') c.scanCount = 2;
+    else if(c.status === 'En proceso') c.scanCount = 1;
+    else c.scanCount = 0;
+  }
+
+  c.scanCount = Number(c.scanCount);
+  return c;
+}
+
+citas = citas.map(normalizeCita).filter(Boolean);
+saveCitas();
+
+// ================= NAV =================
 
 function showPage(p){
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  const el=document.getElementById('page-'+p);if(el)el.classList.add('active');
-  document.getElementById('main-nav').style.display='flex';
-  document.getElementById('main-footer').style.display='block';
-  document.getElementById('admin-page').classList.remove('active');
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+  const el = document.getElementById('page-' + p);
+  if(el) el.classList.add('active');
+
+  const nav = document.getElementById('main-nav');
+  const footer = document.getElementById('main-footer');
+  const admin = document.getElementById('admin-page');
+
+  if(nav) nav.style.display = 'flex';
+  if(footer) footer.style.display = 'block';
+  if(admin) admin.classList.remove('active');
+
   window.scrollTo(0,0);
 }
+
 function showAdminLogin(){
-  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
-  document.getElementById('main-nav').style.display='none';
-  document.getElementById('main-footer').style.display='none';
+  document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+
+  document.getElementById('main-nav').style.display = 'none';
+  document.getElementById('main-footer').style.display = 'none';
+
   document.getElementById('admin-page').classList.add('active');
-  document.getElementById('adm-login').style.display='block';
-  document.getElementById('adm-dash').style.display='none';
+  document.getElementById('adm-login').style.display = 'block';
+  document.getElementById('adm-dash').style.display = 'none';
 }
+
 function showMain(){
   document.getElementById('admin-page').classList.remove('active');
-  document.getElementById('main-nav').style.display='flex';
-  document.getElementById('main-footer').style.display='block';
+  document.getElementById('main-nav').style.display = 'flex';
+  document.getElementById('main-footer').style.display = 'block';
   showPage('home');
 }
 
+// ================= LOGIN =================
+
 function doLogin(){
-  if(document.getElementById('lu').value==='admin'&&document.getElementById('lp').value==='admin123'){
-    document.getElementById('lerr').style.display='none';
-    document.getElementById('adm-login').style.display='none';
-    document.getElementById('adm-dash').style.display='block';
-    renderStats();renderStats2();renderTable();renderCharts();
-  }else{document.getElementById('lerr').style.display='block';}
+  const u = document.getElementById('lu').value;
+  const p = document.getElementById('lp').value;
+
+  if(u === 'admin' && p === 'admin123') {
+    document.getElementById('lerr').style.display = 'none';
+    document.getElementById('adm-login').style.display = 'none';
+    document.getElementById('adm-dash').style.display = 'block';
+    refreshAdmin();
+  } else {
+    document.getElementById('lerr').style.display = 'block';
+  }
 }
 
+// ================= AGENDA =================
+
 function submitAgenda(){
-  const emp=document.getElementById('ag-emp').value.trim();
-  const car=document.getElementById('ag-car').value;
-  const fec=document.getElementById('ag-fec').value;
-  const hor=document.getElementById('ag-hor').value;
-  const op=document.getElementById('ag-op').value.trim();
-  const tel=document.getElementById('ag-tel').value.trim();
-  const not=document.getElementById('ag-not').value.trim();
-  if(!emp||!car||!fec||!hor||!op){document.getElementById('ag-err').style.display='block';return;}
-  document.getElementById('ag-err').style.display='none';
-  const c={code:genCode(),empresa:emp,operador:op,tel,carga:car,fecha:fec,hora:hor,notas:not,status:'Confirmada',scanCount:0};
-  citas.unshift(c);saveCitas();
+  const emp = document.getElementById('ag-emp').value.trim();
+  const car = document.getElementById('ag-car').value;
+  const fec = document.getElementById('ag-fec').value;
+  const hor = document.getElementById('ag-hor').value;
+  const op  = document.getElementById('ag-op').value.trim();
+  const tel = document.getElementById('ag-tel').value.trim();
+  const not = document.getElementById('ag-not').value.trim();
+
+  if(!emp || !car || !fec || !hor || !op) {
+    document.getElementById('ag-err').style.display = 'block';
+    return;
+  }
+
+  document.getElementById('ag-err').style.display = 'none';
+
+  const c = {
+    code: genCode(),
+    empresa: emp,
+    operador: op,
+    tel: tel,
+    carga: car,
+    fecha: fec,
+    hora: hor,
+    notas: not,
+    status: 'Confirmada',
+    scanCount: 0,
+    createdAt: new Date().toISOString()
+  };
+
+  citas.unshift(c);
+  saveCitas();
+
   showConfirm(c);
-  ['ag-emp','ag-op','ag-tel','ag-not'].forEach(id=>document.getElementById(id).value='');
-  document.getElementById('ag-car').value='';document.getElementById('ag-fec').value='';document.getElementById('ag-hor').value='';
+
+  ['ag-emp','ag-op','ag-tel','ag-not'].forEach(id => {
+    const input = document.getElementById(id);
+    if(input) input.value = '';
+  });
+
+  document.getElementById('ag-car').value = '';
+  document.getElementById('ag-fec').value = '';
+  document.getElementById('ag-hor').value = '';
+}
+
+// ================= QR =================
+
+function toBase64Url(str){
+  return btoa(unescape(encodeURIComponent(str)))
+    .replace(/\+/g,'-')
+    .replace(/\//g,'_')
+    .replace(/=+$/,'');
+}
+
+function fromBase64Url(str){
+  str = String(str || '').replace(/-/g,'+').replace(/_/g,'/');
+  while(str.length % 4) str += '=';
+  return decodeURIComponent(escape(atob(str)));
+}
+
+function buildQrUrl(c){
+  const clean = {
+    code: c.code,
+    empresa: c.empresa,
+    operador: c.operador,
+    tel: c.tel || '',
+    carga: c.carga,
+    fecha: c.fecha,
+    hora: c.hora,
+    notas: c.notas || ''
+  };
+
+  const data = toBase64Url(JSON.stringify(clean));
+  return `${window.location.origin}${window.location.pathname}?scan=${encodeURIComponent(c.code)}&data=${encodeURIComponent(data)}`;
 }
 
 function showConfirm(c){
-  document.getElementById('cf-code').textContent=c.code;
-  document.getElementById('cf-bl').textContent=c.code;
-  const el=document.getElementById('qrcanvas');
-  el.innerHTML='';
-  const qrText=`COOPER T.SMITH\nCodigo: ${c.code}\nEmpresa: ${c.empresa}\nCarga: ${c.carga}\nFecha: ${c.fecha}\nHora: ${c.hora}\nOperador: ${c.operador}\nTel: ${c.tel}\nEstado: ${c.status}`;
-  try{
-    QRCode.toCanvas(document.createElement('canvas'),qrText,{width:190,margin:2,color:{dark:'#1e2914',light:'#ffffff'}},function(err,canvas){
-      if(err){fallbackQR(el,c);return;}
-      canvas.style.cssText='border-radius:6px;display:block;margin:0 auto';
-      el.appendChild(canvas);
-    });
-  }catch(e){fallbackQR(el,c);}
-  const dets=[['🏢','Empresa',c.empresa],['📦','Tipo de Carga',c.carga],['📅','Fecha',c.fecha],['🕐','Horario',c.hora],['👤','Operador',c.operador],['📞','Teléfono',c.tel||'—'],['📝','Notas',c.notas||'—']];
-  document.getElementById('cf-det').innerHTML=dets.map(([i,l,v])=>`<div class="dr"><div class="di">${i}</div><div><div class="dl">${l}</div><div class="dv">${v}</div></div></div>`).join('');
+  c = normalizeCita(c);
+
+  document.getElementById('cf-code').textContent = c.code;
+  document.getElementById('cf-bl').textContent = c.code;
+
+  const badge = document.querySelector('.badge-cf');
+  if(badge) badge.textContent = `${stIco(c.status)} ${c.status}`;
+
+  const el = document.getElementById('qrcanvas');
+  el.innerHTML = '';
+
+  const qrUrl = buildQrUrl(c);
+
+  try {
+    if(window.QRCode) {
+      QRCode.toCanvas(
+        document.createElement('canvas'),
+        qrUrl,
+        {
+          width:190,
+          margin:2,
+          color:{dark:'#1e2914',light:'#ffffff'}
+        },
+        function(err, canvas){
+          if(err) {
+            fallbackQR(el, c);
+            return;
+          }
+          canvas.style.cssText = 'border-radius:6px;display:block;margin:0 auto';
+          el.appendChild(canvas);
+        }
+      );
+    } else {
+      fallbackQR(el, c);
+    }
+  } catch(e) {
+    fallbackQR(el, c);
+  }
+
+  const dets = [
+    ['🏢','Empresa',c.empresa],
+    ['📦','Tipo de Carga',c.carga],
+    ['📅','Fecha',c.fecha],
+    ['🕐','Horario',c.hora],
+    ['👤','Operador',c.operador],
+    ['📞','Teléfono',c.tel || '—'],
+    ['✔','Estado',c.status],
+    ['🔁','Escaneos',String(c.scanCount || 0)],
+    ['📝','Notas',c.notas || '—']
+  ];
+
+  document.getElementById('cf-det').innerHTML = dets.map(([i,l,v]) =>
+    `<div class="dr"><div class="di">${i}</div><div><div class="dl">${esc(l)}</div><div class="dv">${esc(v)}</div></div></div>`
+  ).join('');
+
   showPage('confirm');
 }
+
 function fallbackQR(el,c){
-  const t=encodeURIComponent(buildQrUrl(c));
-  const img=document.createElement('img');
-  img.src=`https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=${t}&color=1e2914&bgcolor=ffffff&margin=8`;
-  img.style.cssText='width:190px;height:190px;border-radius:6px;display:block;margin:0 auto';
+  const t = encodeURIComponent(buildQrUrl(c));
+  const img = document.createElement('img');
+  img.src = `https://api.qrserver.com/v1/create-qr-code/?size=190x190&data=${t}&color=1e2914&bgcolor=ffffff&margin=8`;
+  img.style.cssText = 'width:190px;height:190px;border-radius:6px;display:block;margin:0 auto';
   el.appendChild(img);
 }
 
-function renderStats(){
-  const t=citas.length;
-  const co=citas.filter(c=>c.status==='Confirmada').length;
-  const ep=citas.filter(c=>c.status==='En proceso').length;
-  const cm=citas.filter(c=>c.status==='Completada').length;
-  const h=`<div class="scard"><div class="scard-ic gr">📅</div><h3>${t}</h3><p>Total Citas</p></div>
-    <div class="scard"><div class="scard-ic b">⏺</div><h3>${co}</h3><p>Confirmadas</p></div>
-    <div class="scard"><div class="scard-ic y">⏱</div><h3>${ep}</h3><p>En proceso</p></div>
-    <div class="scard"><div class="scard-ic g">✔</div><h3>${cm}</h3><p>Completadas</p></div>`;
-  document.getElementById('scards').innerHTML=h;
-}
-function renderStats2(){document.getElementById('scards2').innerHTML=document.getElementById('scards').innerHTML;}
+function advanceStatus(c){
+  c = normalizeCita(c);
 
-let charts={};
-function renderCharts(){
-  const tipos={};citas.forEach(c=>{tipos[c.carga]=(tipos[c.carga]||0)+1;});
-  buildChart('chartCarga','bar',Object.keys(tipos),Object.values(tipos),['#3d5229','#2e3d1e','#1e2914','#4a6b34','#5a7f40','#6e9450','#8aae68']);
-  const estados={Confirmada:0,'En proceso':0,Completada:0};
-  citas.forEach(c=>{if(estados[c.status]!==undefined)estados[c.status]++;});
-  buildChart('chartEstado','doughnut',Object.keys(estados),Object.values(estados),['#3b82f6','#f59e0b','#10b981']);
-  const fechas={};
-  citas.slice().sort((a,b)=>a.fecha.localeCompare(b.fecha)).forEach(c=>{fechas[c.fecha]=(fechas[c.fecha]||0)+1;});
-  const fKeys=Object.keys(fechas).slice(-8);
-  buildChart('chartFecha','line',fKeys,fKeys.map(k=>fechas[k]),['#3d5229']);
+  if(c.status === 'Confirmada') {
+    c.status = 'En proceso';
+    c.scanCount = 1;
+    c.lastScan = new Date().toISOString();
+    return 'Primer escaneo registrado. La cita cambió a EN PROCESO.';
+  }
+
+  if(c.status === 'En proceso') {
+    c.status = 'Completada';
+    c.scanCount = 2;
+    c.lastScan = new Date().toISOString();
+    return 'Segundo escaneo registrado. La cita cambió a COMPLETADA.';
+  }
+
+  c.status = 'Completada';
+  c.scanCount = Math.max(c.scanCount || 2, 2);
+  c.lastScan = new Date().toISOString();
+  return 'Esta cita ya estaba COMPLETADA.';
 }
+
+function handleScanFromUrl(){
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('scan');
+  const data = params.get('data');
+
+  if(!code) return;
+
+  let incoming = null;
+
+  if(data) {
+    try {
+      incoming = JSON.parse(fromBase64Url(data));
+    } catch(e) {
+      incoming = null;
+    }
+  }
+
+  let c = citas.find(x => x.code === code);
+
+  if(!c && incoming) {
+    c = {
+      code: incoming.code || code,
+      empresa: incoming.empresa || 'Sin empresa',
+      operador: incoming.operador || 'Sin operador',
+      tel: incoming.tel || '',
+      carga: incoming.carga || 'Sin carga',
+      fecha: incoming.fecha || '',
+      hora: incoming.hora || '',
+      notas: incoming.notas || '',
+      status: 'Confirmada',
+      scanCount: 0
+    };
+    citas.unshift(c);
+  }
+
+  if(!c) {
+    showScanResult({
+      code,
+      empresa:'No encontrada',
+      operador:'—',
+      tel:'—',
+      carga:'—',
+      fecha:'—',
+      hora:'—',
+      notas:'',
+      status:'No encontrada',
+      scanCount:0
+    }, 'No se encontró la cita.');
+    return;
+  }
+
+  const msg = advanceStatus(c);
+  saveCitas();
+  showScanResult(c, msg);
+
+  try {
+    window.history.replaceState({}, document.title, window.location.pathname);
+  } catch(e) {}
+}
+
+function showScanResult(c,msg){
+  let page = document.getElementById('page-scan');
+
+  if(!page) {
+    page = document.createElement('div');
+    page.id = 'page-scan';
+    page.className = 'page';
+    document.body.insertBefore(page, document.getElementById('main-footer'));
+  }
+
+  const rows = [
+    ['🏢','Empresa',c.empresa],
+    ['📦','Tipo de Carga',c.carga],
+    ['📅','Fecha',c.fecha],
+    ['🕐','Horario',c.hora],
+    ['👤','Operador',c.operador],
+    ['📞','Teléfono',c.tel || '—'],
+    ['✔','Estado actual',c.status],
+    ['🔁','Escaneos',String(c.scanCount || 0)]
+  ];
+
+  page.innerHTML = `
+    <div class="cfw">
+      <div class="cfb">
+        <div class="cfh">
+          <div>
+            <h3>Cooper T.Smith — Escaneo QR</h3>
+            <div class="cfcode">${esc(c.code)}</div>
+          </div>
+          <div class="badge-cf">${stIco(c.status)} ${esc(c.status)}</div>
+        </div>
+        <div style="padding:24px 26px;border-bottom:1px solid var(--bd);background:#fafafa">
+          <div style="font-size:18px;font-weight:800;color:var(--g2);margin-bottom:6px">${esc(msg)}</div>
+          <div style="font-size:13px;color:var(--mid)">Movimiento registrado para demostración.</div>
+        </div>
+        <div class="cfd">
+          ${rows.map(([i,l,v]) => `<div class="dr"><div class="di">${i}</div><div><div class="dl">${esc(l)}</div><div class="dv">${esc(v)}</div></div></div>`).join('')}
+        </div>
+        <div class="cfact">
+          <button class="btn-o2" onclick="showAdminLogin()">Ver Admin</button>
+          <button class="btn-green" onclick="showPage('home')" style="flex:1">Volver al inicio</button>
+        </div>
+      </div>
+    </div>
+  `;
+
+  showPage('scan');
+}
+
+// ================= ADMIN =================
+
+function statusClass(s){
+  return String(s || '').toLowerCase().replace(/\s+/g,'');
+}
+
+function stIco(s){
+  if(s === 'Confirmada') return '⏺';
+  if(s === 'En proceso') return '⏱';
+  if(s === 'Completada') return '✔';
+  return '•';
+}
+
+function renderStats(){
+  const total = citas.length;
+  const confirmadas = citas.filter(c => c.status === 'Confirmada').length;
+  const proceso = citas.filter(c => c.status === 'En proceso').length;
+  const completadas = citas.filter(c => c.status === 'Completada').length;
+
+  const h = `
+    <div class="scard"><div class="scard-ic gr">📅</div><h3>${total}</h3><p>Total Citas</p></div>
+    <div class="scard"><div class="scard-ic b">⏺</div><h3>${confirmadas}</h3><p>Confirmadas</p></div>
+    <div class="scard"><div class="scard-ic y">⏱</div><h3>${proceso}</h3><p>En proceso</p></div>
+    <div class="scard"><div class="scard-ic g">✔</div><h3>${completadas}</h3><p>Completadas</p></div>
+  `;
+
+  const scards = document.getElementById('scards');
+  const scards2 = document.getElementById('scards2');
+
+  if(scards) scards.innerHTML = h;
+  if(scards2) scards2.innerHTML = h;
+}
+
+function renderStats2(){
+  renderStats();
+}
+
+let charts = {};
+
+function renderCharts(){
+  if(!window.Chart) return;
+
+  const tipos = {};
+  citas.forEach(c => tipos[c.carga] = (tipos[c.carga] || 0) + 1);
+
+  buildChart('chartCarga','bar',Object.keys(tipos),Object.values(tipos),['#3d5229','#2e3d1e','#1e2914','#4a6b34']);
+
+  const estados = {
+    'Confirmada': citas.filter(c => c.status === 'Confirmada').length,
+    'En proceso': citas.filter(c => c.status === 'En proceso').length,
+    'Completada': citas.filter(c => c.status === 'Completada').length
+  };
+
+  buildChart('chartEstado','doughnut',Object.keys(estados),Object.values(estados),['#3b82f6','#f59e0b','#10b981']);
+
+  const fechas = {};
+  citas.slice().sort((a,b) => String(a.fecha).localeCompare(String(b.fecha))).forEach(c => {
+    fechas[c.fecha] = (fechas[c.fecha] || 0) + 1;
+  });
+
+  const fKeys = Object.keys(fechas).slice(-8);
+  buildChart('chartFecha','line',fKeys,fKeys.map(k => fechas[k]),['#3d5229']);
+}
+
 function buildChart(id,type,labels,data,colors){
-  if(charts[id]){charts[id].destroy();}
-  const ctx=document.getElementById(id);if(!ctx)return;
-  charts[id]=new Chart(ctx,{
+  const ctx = document.getElementById(id);
+  if(!ctx || !window.Chart) return;
+
+  if(charts[id]) charts[id].destroy();
+
+  charts[id] = new Chart(ctx,{
     type,
-    data:{labels,datasets:[{data,backgroundColor:type==='line'?'rgba(61,82,41,0.15)':colors,borderColor:type==='line'?'#3d5229':colors,borderWidth:type==='line'?2:0,fill:type==='line',tension:0.4,pointBackgroundColor:'#3d5229',pointRadius:4}]},
-    options:{responsive:true,maintainAspectRatio:true,plugins:{legend:{display:type==='doughnut',position:'right',labels:{font:{size:11},boxWidth:12}}},scales:type!=='doughnut'?{y:{beginAtZero:true,ticks:{stepSize:1,font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},x:{ticks:{font:{size:10}},grid:{display:false}}}:{}}
+    data:{
+      labels,
+      datasets:[{
+        data,
+        backgroundColor:type === 'line' ? 'rgba(61,82,41,0.15)' : colors,
+        borderColor:type === 'line' ? '#3d5229' : colors,
+        borderWidth:type === 'line' ? 2 : 0,
+        fill:type === 'line',
+        tension:0.4,
+        pointBackgroundColor:'#3d5229',
+        pointRadius:4
+      }]
+    },
+    options:{
+      responsive:true,
+      maintainAspectRatio:true,
+      plugins:{
+        legend:{
+          display:type === 'doughnut',
+          position:'right',
+          labels:{font:{size:11},boxWidth:12}
+        }
+      },
+      scales:type !== 'doughnut' ? {
+        y:{beginAtZero:true,ticks:{stepSize:1,font:{size:11}},grid:{color:'rgba(0,0,0,0.05)'}},
+        x:{ticks:{font:{size:10}},grid:{display:false}}
+      } : {}
+    }
   });
 }
-function refreshAdmin(){renderStats();renderStats2();renderTable();renderCharts();}
+
+function refreshAdmin(){
+  citas = citas.map(normalizeCita).filter(Boolean);
+  saveCitas();
+  renderStats();
+  renderTable();
+  renderCharts();
+}
 
 function renderTable(){
-  const q=(document.getElementById('srch').value||'').toLowerCase();
-  const st=document.getElementById('fst').value;
-  const dt=document.getElementById('dfl').value;
-  const filtered=citas.filter(c=>{
-    const mq=!q||(c.empresa.toLowerCase().includes(q)||c.code.toLowerCase().includes(q)||c.operador.toLowerCase().includes(q));
-    return mq&&(!st||c.status===st)&&(!dt||c.fecha===dt);
+  const q = (document.getElementById('srch')?.value || '').toLowerCase();
+  const st = document.getElementById('fst')?.value || '';
+  const dt = document.getElementById('dfl')?.value || '';
+
+  const filtered = citas.filter(c => {
+    const mq = !q || 
+      String(c.empresa).toLowerCase().includes(q) ||
+      String(c.code).toLowerCase().includes(q) ||
+      String(c.operador).toLowerCase().includes(q);
+
+    return mq && (!st || c.status === st) && (!dt || c.fecha === dt);
   });
-  document.getElementById('ctbody').innerHTML=filtered.map((c,i)=>`
+
+  const tbody = document.getElementById('ctbody');
+  if(!tbody) return;
+
+  tbody.innerHTML = filtered.map((c,i) => `
     <tr>
-      <td><code style="font-size:11px;color:var(--mid);font-weight:600">${c.code}</code></td>
-      <td><div style="font-weight:700;font-size:12px">${c.empresa}</div><div class="csub">${c.operador}</div></td>
-      <td>${c.carga}</td><td>${c.fecha}</td><td>${c.hora}</td>
+      <td><code style="font-size:11px;color:var(--mid);font-weight:600">${esc(c.code)}</code></td>
+      <td><div style="font-weight:700;font-size:12px">${esc(c.empresa)}</div><div class="csub">${esc(c.operador)}</div></td>
+      <td>${esc(c.carga)}</td>
+      <td>${esc(c.fecha)}</td>
+      <td>${esc(c.hora)}</td>
       <td>
-        <span class="badge ${statusClass(c.status)}">${stIco(c.status)} ${c.status}</span>
-        <div class="csub">${c.scanCount||0} escaneo(s)</div>
+        <span class="badge ${statusClass(c.status)}">${stIco(c.status)} ${esc(c.status)}</span>
+        <div class="csub">${Number(c.scanCount || 0)} escaneo(s)</div>
       </td>
-      <td><div class="am"><button class="db" onclick="togDD('dr${i}')">•••</button>
-        <div class="dd" id="dr${i}">
-          <button onclick="viewDet('${c.code}')">👁 Ver detalle</button>
-          <button onclick="simulateScan('${c.code}')">📷 Simular escaneo</button>
-          <button class="del" onclick="delCita('${c.code}')">🗑 Eliminar</button>
-        </div></div></td>
-    </tr>`).join('');
-}
-function stIco(s){return s==='Confirmada'?'⏺':s==='En proceso'?'⏱':s==='Completada'?'✔':'•';}
-function chSt(code,st){const c=citas.find(x=>x.code===code);if(c){c.status=st;saveCitas();renderTable();renderStats();renderStats2();renderCharts();}}
-function delCita(code){if(confirm('¿Eliminar esta cita?')){citas=citas.filter(c=>c.code!==code);saveCitas();renderTable();renderStats();renderStats2();renderCharts();}}
-function viewDet(code){
-  const c=citas.find(x=>x.code===code);if(!c)return;
-  document.getElementById('mot').textContent=c.code;
-  document.getElementById('mos').textContent=`${c.empresa} — ${c.status}`;
-  document.getElementById('mob').innerHTML=`<div style="display:grid;gap:8px">${[['🏢','Empresa',c.empresa],['📦','Carga',c.carga],['📅','Fecha',c.fecha],['🕐','Hora',c.hora],['👤','Operador',c.operador],['📞','Teléfono',c.tel||'—'],['📝','Notas',c.notas||'—'],['✔','Estado',c.status]].map(([i,l,v])=>`<div style="display:flex;gap:9px;align-items:center;padding:8px;background:#f5f5f5;border-radius:7px"><span style="font-size:16px">${i}</span><div><div style="font-size:10px;color:var(--mid);text-transform:uppercase">${l}</div><div style="font-weight:700;font-size:13px">${v}</div></div></div>`).join('')}</div>`;
-  document.getElementById('mov').classList.add('open');
-}
-function togDD(id){document.querySelectorAll('.dd').forEach(d=>{if(d.id!==id)d.classList.remove('open');});document.getElementById(id).classList.toggle('open');}
-document.addEventListener('click',e=>{if(!e.target.closest('.am'))document.querySelectorAll('.dd').forEach(d=>d.classList.remove('open'));});
-function closeMod(e){if(!e||e.target===document.getElementById('mov'))document.getElementById('mov').classList.remove('open');}
-function toggleDF(){const el=document.getElementById('dfl');el.style.display=el.style.display==='none'?'block':'none';}
-function switchTab(t){
-  document.getElementById('dash-tab').style.display=t==='d'?'block':'none';
-  document.getElementById('citas-tab').style.display=t==='c'?'block':'none';
-  document.getElementById('tab-d').classList.toggle('active',t==='d');
-  document.getElementById('tab-c').classList.toggle('active',t==='c');
-  if(t==='d')setTimeout(renderCharts,50);
-}
-function exportCSV(){
-  const h='Código,Empresa,Operador,Teléfono,Carga,Fecha,Hora,Estado,Notas\n';
-  const r=citas.map(c=>`${c.code},"${c.empresa}","${c.operador}","${c.tel}","${c.carga}",${c.fecha},${c.hora},${c.status},"${c.notas}"`).join('\n');
-  const b=new Blob([h+r],{type:'text/csv'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download='citas-cooper.csv';a.click();
+      <td>
+        <div class="am">
+          <button class="db" onclick="togDD('dr${i}')">•••</button>
+          <div class="dd" id="dr${i}">
+            <button onclick="viewDet('${esc(c.code)}')">👁 Ver detalle</button>
+            <button onclick="simulateScan('${esc(c.code)}')">📷 Simular escaneo</button>
+            <button class="del" onclick="delCita('${esc(c.code)}')">🗑 Eliminar</button>
+          </div>
+        </div>
+      </td>
+    </tr>
+  `).join('');
 }
 
-document.addEventListener('DOMContentLoaded',function(){
-  citas=citas.map(normalizeCita);
+function simulateScan(code){
+  const c = citas.find(x => x.code === code);
+  if(!c) return;
+
+  const msg = advanceStatus(c);
+  saveCitas();
+  refreshAdmin();
+  alert(msg);
+}
+
+function delCita(code){
+  if(confirm('¿Eliminar esta cita?')) {
+    citas = citas.filter(c => c.code !== code);
+    saveCitas();
+    refreshAdmin();
+  }
+}
+
+function viewDet(code){
+  const c = citas.find(x => x.code === code);
+  if(!c) return;
+
+  document.getElementById('mot').textContent = c.code;
+  document.getElementById('mos').textContent = `${c.empresa} — ${c.status}`;
+
+  const rows = [
+    ['🏢','Empresa',c.empresa],
+    ['📦','Carga',c.carga],
+    ['📅','Fecha',c.fecha],
+    ['🕐','Hora',c.hora],
+    ['👤','Operador',c.operador],
+    ['📞','Teléfono',c.tel || '—'],
+    ['✔','Estado',c.status],
+    ['🔁','Escaneos',String(c.scanCount || 0)],
+    ['📝','Notas',c.notas || '—']
+  ];
+
+  document.getElementById('mob').innerHTML = `<div style="display:grid;gap:8px">
+    ${rows.map(([i,l,v]) => `<div style="display:flex;gap:9px;align-items:center;padding:8px;background:#f5f5f5;border-radius:7px"><span style="font-size:16px">${i}</span><div><div style="font-size:10px;color:var(--mid);text-transform:uppercase">${esc(l)}</div><div style="font-weight:700;font-size:13px">${esc(v)}</div></div></div>`).join('')}
+  </div>`;
+
+  document.getElementById('mov').classList.add('open');
+}
+
+function togDD(id){
+  document.querySelectorAll('.dd').forEach(d => {
+    if(d.id !== id) d.classList.remove('open');
+  });
+
+  const el = document.getElementById(id);
+  if(el) el.classList.toggle('open');
+}
+
+document.addEventListener('click', e => {
+  if(!e.target.closest('.am')) {
+    document.querySelectorAll('.dd').forEach(d => d.classList.remove('open'));
+  }
+});
+
+function closeMod(e){
+  if(!e || e.target === document.getElementById('mov')) {
+    document.getElementById('mov').classList.remove('open');
+  }
+}
+
+function toggleDF(){
+  const el = document.getElementById('dfl');
+  if(el) el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function switchTab(t){
+  document.getElementById('dash-tab').style.display = t === 'd' ? 'block' : 'none';
+  document.getElementById('citas-tab').style.display = t === 'c' ? 'block' : 'none';
+
+  document.getElementById('tab-d').classList.toggle('active', t === 'd');
+  document.getElementById('tab-c').classList.toggle('active', t === 'c');
+
+  if(t === 'd') setTimeout(renderCharts,50);
+}
+
+function exportCSV(){
+  const h = 'Código,Empresa,Operador,Teléfono,Carga,Fecha,Hora,Estado,Escaneos,Notas\n';
+
+  const r = citas.map(c =>
+    `${c.code},"${String(c.empresa).replaceAll('"','""')}","${String(c.operador).replaceAll('"','""')}","${String(c.tel || '').replaceAll('"','""')}","${String(c.carga).replaceAll('"','""')}",${c.fecha},${c.hora},${c.status},${c.scanCount || 0},"${String(c.notas || '').replaceAll('"','""')}"`
+  ).join('\n');
+
+  const b = new Blob([h+r],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(b);
+  a.download = 'citas-cooper.csv';
+  a.click();
+}
+
+// ================= INIT =================
+
+document.addEventListener('DOMContentLoaded', function(){
+  citas = citas.map(normalizeCita).filter(Boolean);
   saveCitas();
   handleScanFromUrl();
 });
