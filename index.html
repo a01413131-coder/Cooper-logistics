@@ -1094,8 +1094,14 @@ function simulateScan(code){
 
   const msg = advanceStatus(c);
   saveCitas();
-  refreshAdmin();
-  alert(msg);
+
+window.dispatchEvent(new StorageEvent('storage', {
+  key: STORAGE_KEY
+}));
+
+refreshAdmin();
+
+alert(msg);
 }
 
 function delCita(code){
@@ -1184,6 +1190,35 @@ function exportCSV(){
 
 // ================= INIT =================
 
+
+window.addEventListener('storage', function(e){
+
+  if(e.key === STORAGE_KEY){
+
+    try{
+
+      citas = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+      citas = citas.map(normalizeCita).filter(Boolean);
+
+      if(
+        document.getElementById('adm-dash') &&
+        document.getElementById('adm-dash').style.display !== 'none'
+      ){
+
+        refreshAdmin();
+
+      }
+
+    }catch(err){
+
+      console.error('Realtime sync error', err);
+
+    }
+
+  }
+
+});
 document.addEventListener('DOMContentLoaded', function(){
   citas = citas.map(normalizeCita).filter(Boolean);
   saveCitas();
