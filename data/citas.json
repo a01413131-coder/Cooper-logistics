@@ -1,0 +1,15 @@
+[
+  {
+    "code": "CTS-DEMO001",
+    "empresa": "Demo Logistics",
+    "operador": "Operador Demo",
+    "tel": "+52 833 000 0000",
+    "carga": "Carga General",
+    "fecha": "2026-05-20",
+    "hora": "10:00 hrs",
+    "notas": "Cita de demostracion",
+    "status": "Confirmada",
+    "scanCount": 0,
+    "createdAt": "2026-05-20T10:00:00.000Z"
+  }
+]
