@@ -579,10 +579,16 @@ function loadLocal(){
 }
 
 async function apiRequest(method, payload){
+  const url = method === 'GET'
+    ? `${API_URL}?t=${Date.now()}`
+    : API_URL;
+
   const options = {
     method,
+    cache: 'no-store',
     headers: {
-      'Content-Type': 'application/json'
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-cache'
     }
   };
 
@@ -590,7 +596,7 @@ async function apiRequest(method, payload){
     options.body = JSON.stringify(payload);
   }
 
-  const response = await fetch(API_URL, options);
+  const response = await fetch(url, options);
   const data = await response.json().catch(() => ({}));
 
   if (!response.ok || !data.ok) {
