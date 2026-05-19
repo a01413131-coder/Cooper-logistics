@@ -7,3 +7,5 @@ index.backup-*.html
 *.respaldo-*.html
 index.respaldo-*.html
 index.realtime-backup.html
+.vercel
+.env*.local
