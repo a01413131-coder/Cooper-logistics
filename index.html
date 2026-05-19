@@ -502,12 +502,7 @@ tr:hover td{background:#fafafa}
         <div class="scards" id="scards2"></div>
         <div class="tcontrols">
           <div class="si"><span class="ico">🔍</span><input id="srch" type="text" placeholder="Buscar por empresa, código o contacto..." oninput="renderTable()"/></div>
-          <select class="fsel" id="fst" onchange="renderTable()">
-  <option value="">Todos</option>
-  <option>Confirmada</option>
-  <option>En proceso</option>
-  <option>Completada</option>
-</select>
+          <select class="fsel" id="fst" onchange="renderTable()"><option value="">Todos</option><option>Confirmada</option><option>En proceso</option><option>Completada</option></select>
           <button class="bdt" onclick="toggleDF()">📅 Filtrar fecha</button>
           <input type="date" id="dfl" style="display:none;padding:8px 11px;border:1px solid var(--bd);border-radius:7px;font-size:12px" onchange="renderTable()"/>
         </div>
@@ -529,29 +524,13 @@ tr:hover td{background:#fafafa}
 </div>
 
 <script>
-// ==========================================================
-// COOPER LOGISTICS - LOGICA ESTABLE
-// Estados: Confirmada -> En proceso -> Completada
-// ==========================================================
-
 const STORAGE_KEY = 'cts_v3';
+const API_URL = '/api/citas';
+
 let citas = [];
-
-try {
-  citas = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-  if (!Array.isArray(citas)) citas = [];
-} catch(e) {
-  citas = [];
-}
-
-if (!citas.length) {
-  citas = [
-    {code:'CTS-8A4IT562',empresa:'TransMex',operador:'Carlos García',tel:'+52 833 111 1111',carga:'Carga General',fecha:'2026-05-28',hora:'14:00 hrs',notas:'',status:'Confirmada',scanCount:0},
-    {code:'CTS-P09Z2Q8Z',empresa:'Maeva',operador:'Rocío Román Redondo',tel:'+52 833 222 2222',carga:'Fertilizantes',fecha:'2026-05-20',hora:'11:00 hrs',notas:'',status:'En proceso',scanCount:1},
-    {code:'CTS-A1B2C3D4',empresa:'ImportEx',operador:'Luis Pérez',tel:'+52 833 333 3333',carga:'Carbón',fecha:'2026-05-15',hora:'09:00 hrs',notas:'',status:'Completada',scanCount:2}
-  ];
-  saveCitas();
-}
+let charts = {};
+let lastCloudSignature = '';
+let pollingStarted = false;
 
 function esc(v){
   return String(v ?? '').replace(/[&<>"']/g, m => ({
@@ -563,10 +542,99 @@ function esc(v){
   }[m]));
 }
 
-function saveCitas(){
+function saveLocal(){
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(citas));
   } catch(e) {}
+}
+
+function loadLocal(){
+  try {
+    citas = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+    if (!Array.isArray(citas)) citas = [];
+  } catch(e) {
+    citas = [];
+  }
+
+  if (!citas.length) {
+    citas = [
+      {
+        code:'CTS-DEMO001',
+        empresa:'Demo Logistics',
+        operador:'Operador Demo',
+        tel:'+52 833 000 0000',
+        carga:'Carga General',
+        fecha:'2026-05-20',
+        hora:'10:00 hrs',
+        notas:'Cita de demostracion',
+        status:'Confirmada',
+        scanCount:0,
+        createdAt:new Date().toISOString()
+      }
+    ];
+    saveLocal();
+  }
+
+  citas = citas.map(normalizeCita).filter(Boolean);
+}
+
+async function apiRequest(method, payload){
+  const options = {
+    method,
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  };
+
+  if (payload) {
+    options.body = JSON.stringify(payload);
+  }
+
+  const response = await fetch(API_URL, options);
+  const data = await response.json().catch(() => ({}));
+
+  if (!response.ok || !data.ok) {
+    throw new Error(data.error || 'Error API');
+  }
+
+  return data;
+}
+
+async function syncFromCloud(force){
+  try {
+    const data = await apiRequest('GET');
+    const cloudCitas = Array.isArray(data.citas) ? data.citas.map(normalizeCita).filter(Boolean) : [];
+    const signature = JSON.stringify(cloudCitas);
+
+    if (force || signature !== lastCloudSignature) {
+      citas = cloudCitas;
+      lastCloudSignature = signature;
+      saveLocal();
+
+      if (isAdminOpen()) {
+        refreshAdmin();
+      }
+    }
+
+    return true;
+  } catch(e) {
+    return false;
+  }
+}
+
+function startPolling(){
+  if (pollingStarted) return;
+
+  pollingStarted = true;
+
+  setInterval(() => {
+    syncFromCloud(false);
+  }, 2000);
+}
+
+function isAdminOpen(){
+  const admin = document.getElementById('adm-dash');
+  return admin && admin.style.display !== 'none';
 }
 
 function genCode(){
@@ -578,6 +646,8 @@ function genCode(){
 
 function normalizeCita(c){
   if(!c || typeof c !== 'object') return null;
+
+  if(!c.code) c.code = genCode();
 
   if(c.status === 'Pendiente') {
     c.status = 'En proceso';
@@ -600,16 +670,13 @@ function normalizeCita(c){
   }
 
   c.scanCount = Number(c.scanCount);
+
   return c;
 }
 
-citas = citas.map(normalizeCita).filter(Boolean);
-saveCitas();
-
-// ================= NAV =================
-
 function showPage(p){
   document.querySelectorAll('.page').forEach(x => x.classList.remove('active'));
+
   const el = document.getElementById('page-' + p);
   if(el) el.classList.add('active');
 
@@ -629,7 +696,6 @@ function showAdminLogin(){
 
   document.getElementById('main-nav').style.display = 'none';
   document.getElementById('main-footer').style.display = 'none';
-
   document.getElementById('admin-page').classList.add('active');
   document.getElementById('adm-login').style.display = 'block';
   document.getElementById('adm-dash').style.display = 'none';
@@ -642,9 +708,7 @@ function showMain(){
   showPage('home');
 }
 
-// ================= LOGIN =================
-
-function doLogin(){
+async function doLogin(){
   const u = document.getElementById('lu').value;
   const p = document.getElementById('lp').value;
 
@@ -652,15 +716,17 @@ function doLogin(){
     document.getElementById('lerr').style.display = 'none';
     document.getElementById('adm-login').style.display = 'none';
     document.getElementById('adm-dash').style.display = 'block';
+
+    await syncFromCloud(true);
     refreshAdmin();
+    startPolling();
+
   } else {
     document.getElementById('lerr').style.display = 'block';
   }
 }
 
-// ================= AGENDA =================
-
-function submitAgenda(){
+async function submitAgenda(){
   const emp = document.getElementById('ag-emp').value.trim();
   const car = document.getElementById('ag-car').value;
   const fec = document.getElementById('ag-fec').value;
@@ -691,9 +757,25 @@ function submitAgenda(){
   };
 
   citas.unshift(c);
-  saveCitas();
-
+  saveLocal();
   showConfirm(c);
+
+  try {
+    const result = await apiRequest('POST', {
+      action: 'create',
+      cita: c
+    });
+
+    if (Array.isArray(result.citas)) {
+      citas = result.citas.map(normalizeCita).filter(Boolean);
+      saveLocal();
+    }
+
+    lastCloudSignature = JSON.stringify(citas);
+
+  } catch(e) {
+    console.warn('La cita quedo local porque la API aun no esta lista:', e.message);
+  }
 
   ['ag-emp','ag-op','ag-tel','ag-not'].forEach(id => {
     const input = document.getElementById(id);
@@ -704,8 +786,6 @@ function submitAgenda(){
   document.getElementById('ag-fec').value = '';
   document.getElementById('ag-hor').value = '';
 }
-
-// ================= QR =================
 
 function toBase64Url(str){
   return btoa(unescape(encodeURIComponent(str)))
@@ -810,14 +890,14 @@ function advanceStatus(c){
     c.status = 'En proceso';
     c.scanCount = 1;
     c.lastScan = new Date().toISOString();
-    return 'Primer escaneo registrado. La cita cambió a EN PROCESO.';
+    return 'Primer escaneo registrado. La cita cambio a EN PROCESO.';
   }
 
   if(c.status === 'En proceso') {
     c.status = 'Completada';
     c.scanCount = 2;
     c.lastScan = new Date().toISOString();
-    return 'Segundo escaneo registrado. La cita cambió a COMPLETADA.';
+    return 'Segundo escaneo registrado. La cita cambio a COMPLETADA.';
   }
 
   c.status = 'Completada';
@@ -826,7 +906,7 @@ function advanceStatus(c){
   return 'Esta cita ya estaba COMPLETADA.';
 }
 
-function handleScanFromUrl(){
+async function handleScanFromUrl(){
   const params = new URLSearchParams(window.location.search);
   const code = params.get('scan');
   const data = params.get('data');
@@ -843,43 +923,60 @@ function handleScanFromUrl(){
     }
   }
 
-  let c = citas.find(x => x.code === code);
-
-  if(!c && incoming) {
-    c = {
-      code: incoming.code || code,
-      empresa: incoming.empresa || 'Sin empresa',
-      operador: incoming.operador || 'Sin operador',
-      tel: incoming.tel || '',
-      carga: incoming.carga || 'Sin carga',
-      fecha: incoming.fecha || '',
-      hora: incoming.hora || '',
-      notas: incoming.notas || '',
-      status: 'Confirmada',
-      scanCount: 0
-    };
-    citas.unshift(c);
-  }
-
-  if(!c) {
-    showScanResult({
+  try {
+    const result = await apiRequest('PATCH', {
+      action: 'scan',
       code,
-      empresa:'No encontrada',
-      operador:'—',
-      tel:'—',
-      carga:'—',
-      fecha:'—',
-      hora:'—',
-      notas:'',
-      status:'No encontrada',
-      scanCount:0
-    }, 'No se encontró la cita.');
-    return;
-  }
+      data: incoming || {}
+    });
 
-  const msg = advanceStatus(c);
-  saveCitas();
-  showScanResult(c, msg);
+    if (Array.isArray(result.citas)) {
+      citas = result.citas.map(normalizeCita).filter(Boolean);
+      saveLocal();
+      lastCloudSignature = JSON.stringify(citas);
+    }
+
+    showScanResult(result.cita, result.message);
+
+  } catch(e) {
+    let c = citas.find(x => x.code === code);
+
+    if(!c && incoming) {
+      c = normalizeCita({
+        code: incoming.code || code,
+        empresa: incoming.empresa || 'Sin empresa',
+        operador: incoming.operador || 'Sin operador',
+        tel: incoming.tel || '',
+        carga: incoming.carga || 'Sin carga',
+        fecha: incoming.fecha || '',
+        hora: incoming.hora || '',
+        notas: incoming.notas || '',
+        status: 'Confirmada',
+        scanCount: 0
+      });
+
+      citas.unshift(c);
+    }
+
+    if(c) {
+      const msg = advanceStatus(c) + ' Modo local.';
+      saveLocal();
+      showScanResult(c, msg);
+    } else {
+      showScanResult({
+        code,
+        empresa:'No encontrada',
+        operador:'—',
+        tel:'—',
+        carga:'—',
+        fecha:'—',
+        hora:'—',
+        notas:'',
+        status:'No encontrada',
+        scanCount:0
+      }, 'No se encontro la cita.');
+    }
+  }
 
   try {
     window.history.replaceState({}, document.title, window.location.pathname);
@@ -887,6 +984,8 @@ function handleScanFromUrl(){
 }
 
 function showScanResult(c,msg){
+  c = normalizeCita(c) || c;
+
   let page = document.getElementById('page-scan');
 
   if(!page) {
@@ -919,7 +1018,7 @@ function showScanResult(c,msg){
         </div>
         <div style="padding:24px 26px;border-bottom:1px solid var(--bd);background:#fafafa">
           <div style="font-size:18px;font-weight:800;color:var(--g2);margin-bottom:6px">${esc(msg)}</div>
-          <div style="font-size:13px;color:var(--mid)">Movimiento registrado para demostración.</div>
+          <div style="font-size:13px;color:var(--mid)">Movimiento registrado en GitHub para la demo.</div>
         </div>
         <div class="cfd">
           ${rows.map(([i,l,v]) => `<div class="dr"><div class="di">${i}</div><div><div class="dl">${esc(l)}</div><div class="dv">${esc(v)}</div></div></div>`).join('')}
@@ -934,8 +1033,6 @@ function showScanResult(c,msg){
 
   showPage('scan');
 }
-
-// ================= ADMIN =================
 
 function statusClass(s){
   return String(s || '').toLowerCase().replace(/\s+/g,'');
@@ -971,8 +1068,6 @@ function renderStats(){
 function renderStats2(){
   renderStats();
 }
-
-let charts = {};
 
 function renderCharts(){
   if(!window.Chart) return;
@@ -1040,7 +1135,7 @@ function buildChart(id,type,labels,data,colors){
 
 function refreshAdmin(){
   citas = citas.map(normalizeCita).filter(Boolean);
-  saveCitas();
+  saveLocal();
   renderStats();
   renderTable();
   renderCharts();
@@ -1052,7 +1147,7 @@ function renderTable(){
   const dt = document.getElementById('dfl')?.value || '';
 
   const filtered = citas.filter(c => {
-    const mq = !q || 
+    const mq = !q ||
       String(c.empresa).toLowerCase().includes(q) ||
       String(c.code).toLowerCase().includes(q) ||
       String(c.operador).toLowerCase().includes(q);
@@ -1088,28 +1183,52 @@ function renderTable(){
   `).join('');
 }
 
-function simulateScan(code){
-  const c = citas.find(x => x.code === code);
-  if(!c) return;
+async function simulateScan(code){
+  try {
+    const result = await apiRequest('PATCH', {
+      action:'scan',
+      code,
+      data:{}
+    });
 
-  const msg = advanceStatus(c);
-  saveCitas();
+    if (Array.isArray(result.citas)) {
+      citas = result.citas.map(normalizeCita).filter(Boolean);
+      saveLocal();
+    }
 
-window.dispatchEvent(new StorageEvent('storage', {
-  key: STORAGE_KEY
-}));
+    refreshAdmin();
+    alert(result.message);
 
-refreshAdmin();
+  } catch(e) {
+    const c = citas.find(x => x.code === code);
+    if(!c) return;
 
-alert(msg);
+    const msg = advanceStatus(c);
+    saveLocal();
+    refreshAdmin();
+    alert(msg + ' Modo local.');
+  }
 }
 
-function delCita(code){
-  if(confirm('¿Eliminar esta cita?')) {
-    citas = citas.filter(c => c.code !== code);
-    saveCitas();
-    refreshAdmin();
-  }
+async function delCita(code){
+  if(!confirm('¿Eliminar esta cita?')) return;
+
+  citas = citas.filter(c => c.code !== code);
+  saveLocal();
+  refreshAdmin();
+
+  try {
+    const result = await apiRequest('POST', {
+      action:'delete',
+      code
+    });
+
+    if (Array.isArray(result.citas)) {
+      citas = result.citas.map(normalizeCita).filter(Boolean);
+      saveLocal();
+      refreshAdmin();
+    }
+  } catch(e) {}
 }
 
 function viewDet(code){
@@ -1175,7 +1294,7 @@ function switchTab(t){
 }
 
 function exportCSV(){
-  const h = 'Código,Empresa,Operador,Teléfono,Carga,Fecha,Hora,Estado,Escaneos,Notas\n';
+  const h = 'Codigo,Empresa,Operador,Telefono,Carga,Fecha,Hora,Estado,Escaneos,Notas\n';
 
   const r = citas.map(c =>
     `${c.code},"${String(c.empresa).replaceAll('"','""')}","${String(c.operador).replaceAll('"','""')}","${String(c.tel || '').replaceAll('"','""')}","${String(c.carga).replaceAll('"','""')}",${c.fecha},${c.hora},${c.status},${c.scanCount || 0},"${String(c.notas || '').replaceAll('"','""')}"`
@@ -1188,41 +1307,14 @@ function exportCSV(){
   a.click();
 }
 
-// ================= INIT =================
+document.addEventListener('DOMContentLoaded', async function(){
+  loadLocal();
+  saveLocal();
 
+  await syncFromCloud(true);
+  await handleScanFromUrl();
 
-window.addEventListener('storage', function(e){
-
-  if(e.key === STORAGE_KEY){
-
-    try{
-
-      citas = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
-
-      citas = citas.map(normalizeCita).filter(Boolean);
-
-      if(
-        document.getElementById('adm-dash') &&
-        document.getElementById('adm-dash').style.display !== 'none'
-      ){
-
-        refreshAdmin();
-
-      }
-
-    }catch(err){
-
-      console.error('Realtime sync error', err);
-
-    }
-
-  }
-
-});
-document.addEventListener('DOMContentLoaded', function(){
-  citas = citas.map(normalizeCita).filter(Boolean);
-  saveCitas();
-  handleScanFromUrl();
+  startPolling();
 });
 </script>
 </body>
