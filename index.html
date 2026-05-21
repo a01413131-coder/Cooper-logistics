@@ -1139,13 +1139,52 @@ function buildChart(id,type,labels,data,colors){
   });
 }
 
+
 function refreshAdmin(){
-  citas = citas.map(normalizeCita).filter(Boolean);
-  saveLocal();
-  renderStats();
-  renderTable();
-  renderCharts();
+
+  const admBody = document.getElementById('adm-body');
+
+  if(!admBody) return;
+
+  citas = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+
+  admBody.innerHTML = '';
+
+  citas.forEach((c,i)=>{
+
+    const tr = document.createElement('tr');
+
+    tr.innerHTML = `
+      <td>${c.code || ''}</td>
+      <td>${c.empresa || ''}</td>
+      <td>${c.operador || ''}</td>
+      <td>${c.carga || ''}</td>
+      <td>${c.fecha || ''}</td>
+      <td>${c.hora || ''}</td>
+      <td>
+        <span class="badge ${
+          c.status === 'Completada'
+            ? 'bg-success'
+            : c.status === 'En proceso'
+              ? 'bg-warning text-dark'
+              : 'bg-primary'
+        }">
+          ${c.status || 'Confirmada'}
+        </span>
+      </td>
+      <td>
+        <button class="btn btn-danger btn-sm" onclick="deleteCita('${c.code}')">
+          Eliminar
+        </button>
+      </td>
+    `;
+
+    admBody.appendChild(tr);
+
+  });
+
 }
+
 
 function renderTable(){
   const q = (document.getElementById('srch')?.value || '').toLowerCase();
